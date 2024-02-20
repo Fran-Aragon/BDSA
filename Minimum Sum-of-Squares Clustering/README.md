@@ -1,1 +1,1 @@
-# Minimum Sum-of-Squares Constrained Clustering 
+# Minimum Sum-of-Squares Constrained Clustering Problem
