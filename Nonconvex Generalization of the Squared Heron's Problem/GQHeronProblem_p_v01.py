@@ -10,6 +10,8 @@ We test the nonconvex splitting for a generalized Heron problem
 consisting in finding a point x in a cc set C0 which minimizes the sum of 
 the quadratic distances of the image of x by some quadratic transformation
 to some cc sets C1,...,Cr
+
+Experiment starts line 205
 """
 
 from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
@@ -37,19 +39,7 @@ def PC0(x):
         return rC0*x/norm(x)
     else:
         return x
-# rC0 = norm(5*np.ones([n]))
 
-# def PC0(x):
-#     # if norm(x) > rC0:
-#     #     return rC0*x/norm(x)
-#     # else:
-#     ub = 5*np.ones([n])
-#     lb =-5*np.ones([n])
-#     return np.clip(x,lb,ub)
-    
-"c1,...,Cr will be randomly generated hypercubes of length sqrt(2) "
-
-#c is the center of the hypercube
 def PCr(x,c):
     ub = c + np.sqrt(2)/2
     lb = c - np.sqrt(2)/2 
@@ -60,7 +50,6 @@ def PCr(x,c):
 def Qx(x):
     tempQx = Q@x
     return x.T @ tempQx.T
-"The derivative is 2*(Q@x).T"
 
 "Objective function is the following:"
 
@@ -92,7 +81,7 @@ def Phi(x,y):
 
 
 
-"Our algorithm is the foollowing"
+" DSA (no linesearch):"
 
 def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
     " x - initial starting point"
@@ -100,13 +89,12 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
     xk = x.copy()
     yk = np.zeros([r,m])
     "first update"
-    gradQx = 2*(Q @ xk).T   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-    gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) #taking gamma_k < 1/(2*kappa + sum(<L_Psi,yi>))
-    #breakpoint()
-    xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) #update en xk
-    "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
+    gradQx = 2*(Q @ xk).T   
+    gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) 
+    xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) 
+
     wk = (1-beta)*xkn + beta*xk
-    "update en yk"
+    "update  yk"
     ykold =yk.copy()
     for ii in range(r):
         tempyii = yk[ii,:]
@@ -114,20 +102,13 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
         yk[ii,:] = PCr((tempyii+mu*Qx(wk))/(1+mu),cii)
     "here starts the loop"
     k = 1
-    while abs(Phi(xkn,yk)-Phi(xk,ykold)) > tol:  # and k <10:
+    while abs(Phi(xkn,yk)-Phi(xk,ykold)) > tol: 
         xk = xkn.copy()
-        gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+        gradQx = 2*(Q @ xk).T 
         gam  = gamma/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
         "update en xk"
         xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk))
-        #print(Phi(xkn,yk) > Phi(xk,yk))
-        
-        # if Phi(xkn,yk) > Phi(xk,yk):
-        #     print("Error!!")
-        #     print("Iteracion:", k)
-        #     print("Phi(xkn,yk):",Phi(xkn,yk))
-        #     print("Phi(xkn,yk) - Phi(xk,yk):",Phi(xkn,yk)-Phi(xk,yk))
-        #     breakpoint()
+
         wk = (1-beta)*xkn + beta*xk
         "update en yk"
         ykold = yk.copy()
@@ -140,24 +121,23 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
 
 
 
+" BDSA (linesearch):"
+
 def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     " x - initial starting point"
     "the dual variables start all as the 0 vector"
     barlamk = barlam0
     xk = x.copy()
     yk = cCr.copy()
-    gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+    gradQx = 2*(Q @ xk).T 
     gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-    #eta = kappa +  Lips_Qx*sum(norm(yk,axis=1))/2-1/(2*gam)
      
   
     "first update"
-    # gradQx = 2*(Q @ xk).T   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-    # gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) #taking gamma_k < 1/(2*kappa + sum(<L_Psi,yi>))
-    #breakpoint()
+
     xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) #update en xk
-    "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
-    "update en yk"
+
+    "update  yk"
     ykn =yk.copy()
     for ii in range(r):
         tempyii = yk[ii,:]
@@ -182,17 +162,17 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     ykn = ykn + lamk*dyk
     "here starts the loop"
     k = 1
-    #print('Entrando al while')
-    while abs(Phi(xkn,ykn)-Phi(xk,yk)) > tol:  # and k <10:
+
+    while abs(Phi(xkn,ykn)-Phi(xk,yk)) > tol:  
         xk = xkn.copy()
         yk = ykn.copy()
-        gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+        gradQx = 2*(Q @ xk).T 
         gam  = gamma/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-        #eta = kappa +  Lips_Qx*sum(norm(yk,axis=1))/2-1/(2*gam)
-        "update en xk"
+
+        "update  xk"
         xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk))
-        #print(Phi(xkn,yk) > Phi(xk,yk))
-        "update en yk"
+
+        "update  yk"
         ykn= yk.copy()
         for ii in range(r):
             tempyii = yk[ii,:]
@@ -216,32 +196,25 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
         else: barlamk= max(barlam0,(alph**exp_alph)*barlamk)
         xkn = xkn  + lamk*dxk
         ykn = ykn + lamk*dyk
-        # if k%50 == 0:
-        #     print(Phi(xkn,ykn))
-        #     print(Phi(xk,yk))
-        #     breakpoint()
+
     return xkn, ykn, k
 
 
 
 
 
+"START EXPERIMENT"
+##################### EXPERIMENT  ###################################
 
 
-"COMIENZO EXPERIMENTO"
-##################### EXPERIMENTO  ###################################
-
-"Objetivo: comparar el splitting y el boosted splitting para diferentes R de problemas"
-
-use_saved_data = True
+use_saved_data = False # True for using data paper, false for generate new
 
 repP = 10
 repS = 1
 
-n = 20 #[3, 5, 9, 15, 20, 35, 50] #5, 10, 15, 25, 40]
+n = 20 
 m = math.floor(0.8*n)
 sizesr = [3, 5, 7, 10, 15, 20]
-  #[2,3, 5, 7, 10, 15, 20]
 
 E3_Ssol = zeros([len(sizesr),repP,repS])
 E3_Siter = zeros([len(sizesr),repP,repS])
@@ -274,7 +247,7 @@ if use_saved_data == False:
             normcCr = 3*random(r)+7
             cCr = 2*random([r,m])-1
             ncCr = norm(cCr, axis = 1 )
-            cCr = normcCr[:, None] * cCr / ncCr[:, None] #estos son los centros de los hipercubos
+            cCr = normcCr[:, None] * cCr / ncCr[:, None] 
             
             #Operator Psi:
             Q = zeros([m,n,n])
@@ -282,19 +255,16 @@ if use_saved_data == False:
     
             for mm in range(m):
                 tempD = 2*random(n)-1
-                tempQ = np.diag(tempD) #dividimos por radio espectral, radio bola y raíz de m
+                tempQ = np.diag(tempD) 
                 Q[mm,:,:] =  tempQ
-                # tempQ = np.eye(n)
-                # Q[mm,:,:] = np.eye(n)
-                singvaluesQ[mm] = norm(tempQ,2) #guardamos el radio spectral de cada Q_mm
+                singvaluesQ[mm] = norm(tempQ,2) 
             
-            QM = zeros([m*n,n])         #for writting Q in matrix form
+            QM = zeros([m*n,n])         
             for mm in range(m):
                 QM[mm*n:(mm+1)*n,:] = Q[mm]
             normQ =  norm(QM,2) #
             maxu = 2*normQ*rC0
-            Lips_Qx = 2*normQ*rC0  # np.sqrt(m)*2*singvaluesQ.max()*rC0    #Lipschitz constant of Psi(x) = Qx(x)
-            #kappa = 6*r*rC0**2*np.sqrt(m)*normQ/2
+            Lips_Qx = 2*normQ*rC0  
             kappa = 6*r*rC0**2*normQ*np.linalg.norm(np.array([np.linalg.norm(Q[i],ord=2) for i in range(m)]))/2
             
             for rSS in range(repS):
@@ -334,12 +304,7 @@ elif use_saved_data==True:
     E3_Biter = npzfile['arr_4']
     E3_Btime = npzfile['arr_5']
 
-# "Para quitar 2"
-# sizesr = [3, 5, 7, 10, 15, 20]
-# E3_Siter= E3_Siter[1:len(E3_Siter)]
-# E3_Biter= E3_Biter[1:len(E3_Biter)]
-# E3_Stime = E3_Stime[1:len(E3_Stime)]
-# E3_Btime = E3_Btime[1:len(E3_Btime)]
+
 
 
 averagesol0_S = np.sum(E3_Ssol,axis=2)/repS
@@ -377,9 +342,6 @@ difitertotal = np.sum(difiter)/len(sizesr)
 diftimetotal = np.sum(diftime) / len(sizesr)
 
 
-# print('diftime0 = averagetime0_S / averagetime0_B= ', diftime0)
-# print('diftime = averagetime_S / averagetime_B= ', diftime)
-
 " Plot de Iteraciones "
 
 plt.clf()
@@ -395,13 +357,11 @@ for NN in range(len(sizesr)):
 ax.plot(difiter[0:len(sizesr)],'o', markersize = 8, color = 'k')
 ax.hlines(difitertotal,-0.5,len(sizesr)-0.5,linestyle = 'dashed', color = 'mediumblue')
 
-#ax.hlines(1,-.2,len(sizesr)-.8,colors='k',linestyles='dashed',linewidth=0.8)
 ax.set_xlim([-0.5,len(sizesr)-.5])
 ax.set_ylim([4,5.75])
 ax.set_xlabel('p')
 ax.set_ylabel('Iterations ratio DSA/BDSA')
-#ax.set_ylim([0, 30])
-#ax.hlines(1,-0.2,len(sizesr)-.8,colors='k',linestyles='dashed',linewidth=0.8)
+
 ax.set_xticks([0,1,2,3,4,5])
 ax.set_xticklabels(['3', '5', '7', '10', '15','20'])
 plt.title('Varying p')
