@@ -18,7 +18,6 @@ import numpy.linalg as LA
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
 import numpy as np
-#import pylab as plt
 
 seed(4)
 
@@ -41,13 +40,6 @@ vphi = np.vectorize(phi)
 def grad_log_e(x):
     return 2*np.exp(2*x)/(2+np.exp(2*x))
 
-
-
-# def prox_l1(x,gam):
-#     temp = abs(x)- gam
-#     temp[temp<=0] = 0
-#     p = np.sing(x)*temp
-#     return p
 
 def subl1_neg(x):
     p = -np.sign(x)

@@ -17,7 +17,6 @@ import numpy.linalg as LA
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
 import numpy as np
-#import pylab as plt
 
 seed(4)
 
@@ -41,13 +40,6 @@ vphi = np.vectorize(phi)
 def grad_log_e(x):
     return 2*np.exp(2*x)/(2+np.exp(2*x))
 
-
-
-# def prox_l1(x,gam):
-#     temp = abs(x)- gam
-#     temp[temp<=0] = 0
-#     p = np.sing(x)*temp
-#     return p
 
 def subl1_neg(x):
     p = -np.sign(x)
@@ -151,7 +143,6 @@ ymin,ymax=-2.5,3.5
 
 xpoints = np.linspace(xmin,xmax,100)
 
-# List of points in y axis
 ypoints     = np.linspace(ymin,ymax,100)
 
 X, Y = np.meshgrid(xpoints,ypoints)
@@ -172,7 +163,6 @@ for ll in range(3):
     outputBDSA = BDSA(x0,gam_BDSA,prec,alph=.5,barlam0=2,barlamk=2,N=2)
     
 
-    #iDCA = outputiDCA['iDCA']
     BDSAsol = outputBDSA['BDSA']
     
     plt.plot(BDSAsol[:,0],BDSAsol[:,1],'.--',markersize = 6, color='C3',label='Boosted PDCA')
@@ -196,7 +186,6 @@ ymin,ymax=-2.5,3.5
 
 xpoints = np.linspace(xmin,xmax,100)
 
-# List of points in y axis
 ypoints     = np.linspace(ymin,ymax,100)
 
 X, Y = np.meshgrid(xpoints,ypoints)
