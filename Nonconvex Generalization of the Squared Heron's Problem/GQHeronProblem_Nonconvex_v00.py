@@ -33,8 +33,6 @@ seed(4) #4
 
 " Auxiliary functions "
 
-"We will let C0 to be a ball centered at 0 of radius rC0 = 10 so we define its proj"
-
 
 
 def PC0(x):
@@ -44,9 +42,7 @@ def PC0(x):
         return x
 
     
-"c1,...,Cr will be randomly generated hypercubes of length sqrt(2) "
 
-#c is the center of the hypercubes
 def PCr(x,cc):
     p = x
     dist = np.inf
@@ -72,17 +68,16 @@ def varphi(x):
     
 
 
-"Como no hay h, Phi = varphi"
+" Phi = varphi"
 
 def Phi(x):
     return varphi(x)
 
 
-"Our algorithm is the following"
+"DSA (no linesearch):"
 
 def NCsplitting(x,gamma,kappa,tol=1e-6):   #Lips_Qx,
     " x - initial starting point"
-    "the dual variables start all as the 0 vector"
     gam  = gamma*1/(2*kappa )
     xk = x.copy()
     #yk = np.zeros([r,m])
@@ -90,22 +85,21 @@ def NCsplitting(x,gamma,kappa,tol=1e-6):   #Lips_Qx,
     Lxk = L@xk
     subdf= L.T@(Lxk-PCr(Lxk, cc))  
     xkn = PC0( xk  - gam*subdf) #update en xk
-    "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
     "here starts the loop"
     k = 1
     while abs(varphi(xkn)-varphi(xk)) > tol:  # and k <10:
         xk = xkn.copy()
         Lxk = L@xk
         subdf= L.T@(Lxk-PCr(Lxk, cc))   
-        "update en xk"
+        "update xk"
         xkn = PC0( xk - gam*subdf)
-        "update en yk"
         k += 1
     return xkn, k
 
+"BDSA (with linesearch):"
+
 def NCsplitting2(x,gamma,alph,kappa,Ny=2,tol=1e-6):
     " x - initial starting point"
-    "the dual variables start all as the 0 vector"
     barlam0=2
     barlamk = barlam0
     xk = x.copy()
@@ -117,10 +111,8 @@ def NCsplitting2(x,gamma,alph,kappa,Ny=2,tol=1e-6):
     Lxk = L@xk
     subdf= L.T@(Lxk-PCr(Lxk, cc))   
     xkn = PC0( xk - gam*subdf) #update en xk
-    "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
     "Linear Search"
     dxk=xkn-xk
-    # dyk=ykn-yk
     exp_alph = 0
     lamk = barlamk
     while varphi(xkn+lamk*dxk) > Phi(xkn) - 0.1*lamk**2*norm(dxk)**2  :
@@ -134,21 +126,15 @@ def NCsplitting2(x,gamma,alph,kappa,Ny=2,tol=1e-6):
             barlamk = 2*barlamk
     else:barlamk= max((alph**exp_alph)*barlamk,barlam0)
     xkn = xkn  + lamk*dxk
-    # ykn = yk + t*dyk
-    "here starts the loop"
     k = 1
-    #print('Entrando al while')
     while abs(varphi(xkn)-varphi(xk)) > tol:  # and k <10:
         xk = xkn.copy()
-        "update en xk"
+        "update  xk"
         Lxk = L@xk
-        subdf= L.T@(Lxk-PCr(Lxk, cc))   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-        xkn = PC0( xk -gam*subdf)
-        "update en yk"
+        subdf= L.T@(Lxk-PCr(Lxk, cc))   
         k += 1
         "Linear Search"
         dxk=xkn-xk
-        # dyk=ykn-yk
         exp_alph = 0
         lamk = barlamk
         while varphi(xkn+lamk*dxk) > varphi(xkn) -0.1*lamk**2*norm(dxk)**2 :
