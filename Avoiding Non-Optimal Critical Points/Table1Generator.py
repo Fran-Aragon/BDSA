@@ -27,21 +27,16 @@ seed(4)
 
 
 cte = 1  #constant multiplying ||x||^2
-prec=1e-6
-prec0=1e-6
+prec=1e-6 # precision stopping criterion
+prec0=1e-6 # precision for objective function value 
 
-# Auxiliary functions
-
+"Auxiliary functions"
 
 def varphi(x):
     sumat = 0
     for ii in range(1,p+1):
         sumat += np.sum(abs(x-ii)) + np.sum(abs(x+ii))
     return cte*norm(x)**2 -np.sum(abs(x))-sumat -np.sum(abs(x-p-1))
-
-
-# def varphi(x):
-#     return cte*norm(x)**2 - np.sum(abs(x))-np.sum(abs(1-x))
 
 def varphiplot(x,y):
     sumat = 0
@@ -78,9 +73,6 @@ def Phi(x,y):
             sumat += tauvect[2*ii-1]*nones.T@y[2*ii-1,:] +  tauvect[2*ii]*nones.T@y[2*ii,:]
         return cte*norm(x)**2   +  sumat + (p+1)*nones.T@y[2*p+1,:] - x.T@np.sum(y,axis=0)
 
-    
-    
-    
 def proxl1(x,tau,mu): #calcula  prox_mu de la conjugada de |x-tau|_l1
     return np.clip(x-mu*tau,-1,1)
     
@@ -96,6 +88,7 @@ def subh_minus_l1(x): #sub. of -h
     return sumat +minsign(x-p-1)
 
 
+"Experiment"
 ################ BEGINNING EXPERIMENT ##############################
 
 # Change n and p (q) for obtaining the different rows 
@@ -146,14 +139,12 @@ for rr in range(rep):
     x0 = 2*(p+2)*random(n)-(p+2)
     y0 = 2*random(n)-1
     
-    "Double Prox"
+    "Double Proximal Gradient Algorithm"
     
     xk = x0.copy() #initial point for the double-Prox
     yk = np.tile(y0,(ltauvect,1))
     
-    
-
-    
+  
     xkold = xk.copy()
     ykold = yk.copy()
     temp1 = xk + gamma*np.sum(yk,0) #argument proxg
@@ -275,7 +266,7 @@ for rr in range(rep):
         DPgana += 1  
 
 
-    " BDSA no linesearch "
+    " DSA (no linesearch) "
     
     xk = x0.copy()
     gam_min_l1 = 0.9
@@ -295,7 +286,7 @@ for rr in range(rep):
         exitosDSA += 1    
     
     
-    " BDSA linesearch"
+    " BDSA (with linesearch)"
     
     xk = x0.copy()
     gam_min_l1 = 0.9
@@ -303,7 +294,6 @@ for rr in range(rep):
     alph = 0.5
     barlam0 = 2
     barlamk = barlam0
-    #eta = -1/gamma
     N = 2
     
     xkold  =  xk.copy()
@@ -355,69 +345,7 @@ for rr in range(rep):
     if norm(varphi(xk)-phisol) < precO:
         exitosBDSA += 1
        
-    # "DCA"
-
-    # xk =  x0.copy()
-    
-    
-    # xkold = xk.copy()
-    # xk = (subh0(xk)+xk)/3
-    # while norm(xkold-xk)/n > prec:
-    #     xkold = xk.copy()
-    #     xk = (subh0(xk)+xk)/3
-        
-    # if norm(varphi(xk)-phisol) < precO:
-    #     exitosDCA +=1 
-    
-    # DCAphi = varphi(xk)
-          
-    # "BDCA"      
-
-    # xk =  x0.copy()
-    # barlamkold = 0
-    # lamkold = 0
-    # barlamk = 2
-    
-    # xkold = xk.copy()
-    # vk = (subh0(xk)+xk)/3
-    # dk = vk-xk
-    # if (dk==0).all():
-    #     break
-    # else:
-    #     lamk = 2
-    #     while varphi(vk+lamk*dk) > varphi(vk) - 0.1*lamk**2*norm(dk)**2:
-    #         lamk = 0.5*lamk
-    #     xk = vk + lamk*dk
-        
-    # while norm(xkold-xk)/n > prec:
-    #       xkold = xk.copy()
-    #       vk = (subh0(xk)+xk)/3
-    #       dk = vk-xk
-    #       if (dk==0).all():
-    #           break
-    #       else:
-    #           lamk = barlamk
-    #           while varphi(vk+lamk*dk) > varphi(vk) - 0.1*lamk**2*norm(dk)**2:
-    #               lamk = 0.5*lamk
-    #           xk = vk + lamk*dk
-    #       if lamk == barlamk and lamkold == barlamkold:
-    #           barlamkold = barlamk
-    #           barlamk = 2*lamk
-    #       lamkold = lamk
-            
-              
-          
-    # if norm(varphi(xk)-phisol) < precO:
-    #     exitosBDCA +=1 
-        
-    # BDCAphi = varphi(xk)
-    # if BDCAphi - DCAphi<-prec0:
-    #     BDCAgana += 1 
-    # elif abs(DCAphi -BDCAphi)<=prec0:
-    #     DCAempate += 1
-    # else:
-    #     DCAgana += 1
-
+ 
         
     
     "Proximal DC algorithm"
@@ -445,7 +373,6 @@ for rr in range(rep):
     alph = 0.5
     barlam0 = 2
     barlamk = barlam0
-    #eta = -1/gamma
     N = 2
        
     xk = x0.copy()
@@ -472,7 +399,6 @@ for rr in range(rep):
         xkn = hatxk +lamk*dxk                                 
     xk = xkn.copy()
     
-    # breakpoint()
     while norm(xkold-xk)/n > prec:
         xkold = xk.copy()
         temp1 = xk - gamma*subh(xk)#argument proxg

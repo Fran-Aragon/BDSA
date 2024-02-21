@@ -18,20 +18,20 @@ import numpy.linalg as LA
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
 import numpy as np
-#import pylab as plt
 
 
 
 seed(4)
 
-n = 2 # dimension espacio
+n = 2 #  space dimension
 p = 3 # ||x||^2 -|x| - sum_i=1^p (|x-i|+|x+i|) - |x-p-1|
-cte = 1  #contante que multiplica ||x||^2
+cte = 1  #contant multiplying ||x||^2
 nones = np.ones(n)
 prec=1e-6
 prec0=1e-6
 
-# Esto define el vector tauvect, de desplazamientos de la norma l1
+
+"Auxiliary functions "
 tauvect = np.zeros(2*p+2)
 ltauvect = len(tauvect)
 
@@ -40,8 +40,6 @@ for ii in range(1,p+1):
     tauvect[2*ii] = -ii
 tauvect[2*p+1] = p+1
 
-
-# Auxiliary functions:
 
 def varphi(x):
     sumat = 0
@@ -79,15 +77,6 @@ def subh0(x):  #sub  of h (taking 0 )
     return np.sign(x) + sumat +np.sign(x-p-1)
         
 
-# def Phi(x,y):
-#     if (-1>y).any() or (y > 1).any():
-#         return np.inf
-#     else:
-#         sumat = 0
-#         for ii in range(1,p+1):
-#             sumat += tauvect[2*ii-1]*nones.T@y[2*ii-1,:] +  tauvect[2*ii]*nones.T@y[2*ii,:]
-#         return cte*norm(x)**2   +  sumat + (p+1)*nones.T@y[2*p+1,:]
-    
 def Phi(x,y):
     if (-1>y).any() or (y > 1).any():
         return np.inf
@@ -118,11 +107,9 @@ def subh_minus_l1(x): #sub. of -h
 " Initialization"
     
 x0 = np.array([1.5, -0.5]) #initial points
-# y0 = np.array([-1.5,0])#   y0 = np.array([-1.5,0]) #initial points
-y0= np.copy([0,0.])   #np.copy(x0) # np.array([0,0.])
+y0= np.array([0,0.])   
 
-# x0 = 2*(p+2)*random(n)-(p+2)
-# y0 = 2*random(n)-1
+
 
 xmin,xmax=-5,3
 ymin,ymax=-5,2
@@ -162,7 +149,7 @@ iDCA[0,:] = x0
 BDSA[0,:] = x0
 BDSA_ls[0,:] = x0
 
-"Double-Prox"
+"Double-Prox Gradient algorithm"
 
 kk = 1
 xkold = xk.copy()
@@ -197,10 +184,8 @@ while norm(xkold -xk) + np.sum(norm(ykold-yk,axis=1)) > n*prec:
 
 DPGA=DPGA[0:kk,:]
 
-# breakpoint()
-
     
-" Boosted Double Prox"
+" Boosted Double-Prox Gradient Algorithm"
 
 alph = 0.5
 barlam0= 2
@@ -312,7 +297,6 @@ OneProx=OneProx[0:kk,:]
 alph = 0.5
 barlam0 = 2
 barlamk = barlam0
-#eta = -1/gamma
 N = 2
    
 
@@ -490,57 +474,6 @@ while norm(xkold-xk)/n > prec:
 
 BDSA_ls = BDSA_ls[0:kk,:]
 
-# "DCA"
-
-# # decomposition for DCA
-# # varphi(x) = ||x||^2 -h(x) = 3/2||x||^2-(h(x) +1/2||x||^2)
-
-# xk =  x0.copy()
-
-# for kk in range(it):
-#       xk = (subh0(xk)+xk)/3
-#       DCA[kk+1,:] = xk
-      
-# "BDCA"      
-
-# xk =  x0.copy()
-
-# for kk in range(it):
-#       # breakpoint()
-#       vk = (subh0(xk)+xk)/3
-#       dk = vk-xk
-#       if (dk==0).all():
-#           break
-#       else:
-#           lamk = 2
-#           while varphi(vk+lamk*dk) > varphi(vk) - 0.1*lamk**2*norm(dk)**2:
-#               lamk = 0.5*lamk
-#           xk = vk + lamk*dk
-      
-#       BDCA[kk,:] = xk
-      
-# BDCA = BDCA[0:kk,:] 
-
-
-
-
-
-
-"No prox"
-
-# xk = x0.copy()
-
-# for kk in range(it):
-#     xkn = xk - gamma*(2*xk+np.ones(n)-np.sign(xk) )     
-#     xk = xkn.copy()
-#     NoProx[kk+1,:] = xk
-    
-    
-
-# if norm(varphi(xk)-phisol) < prec:
-#     exitosNoProx +=1 
-
-"PLOT"
 "PLOT"    
 
 xpoints = np.linspace(xmin,xmax,600)
@@ -557,7 +490,6 @@ plt.axis([xmin,xmax,ymin,ymax])
 ax = plt.gca()
 ax.set_aspect('equal')
 plt.colorbar()
-#plt.plot(DProxk[:,0],DProxk[:,1],color='k',label='$(xk)_{k\in\mathbb{N}}$')
 
 
 
@@ -570,7 +502,6 @@ plt.plot(DPGA[:,0],DPGA[:,1],'.-',markersize = 6,color='C5',label='DGA',lw=linea
 plt.plot(iDCA[:,0],iDCA[:,1],'d-',markersize = 4,color = 'C0', label = 'iDCA',zorder=2,lw=linea,mew=mlinea)
 plt.plot(BDSA_ls[:,0],BDSA_ls[:,1],'s--', markersize = 4, color=[0.3,0.3,0.3],markerfacecolor='None',label='BDSA',lw=linea,mew=mlinea)
 plt.plot(BOneProx[:,0],BOneProx[:,1],'X--',markersize = 5,markerfacecolor='None', color='C1',label='BPDCA',zorder=3,lw=linea,mew=mlinea)
-#plt.plot(DCA[:,0],DCA[:,1],'.-',markersize = 5,color='C3',label='$DCA$')
 
 plt.plot(BDPGA[:,0],BDPGA[:,1],'.--', markersize = 6, color='C3',markerfacecolor='none',label='BDGA',lw=linea,mew=mlinea)
 
