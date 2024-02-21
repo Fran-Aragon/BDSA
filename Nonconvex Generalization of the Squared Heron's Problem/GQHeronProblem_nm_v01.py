@@ -10,6 +10,8 @@ We test the nonconvex splitting for a generalized Heron problem
 consisting in finding a point x in a cc set C0 which minimizes the sum of 
 the quadratic distances of the image of x by some quadratic transformation
 to some cc sets C1,...,Cr
+
+Start of the experiment line 205
 """
 
 from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
@@ -23,33 +25,21 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 import pandas as pd
 import numpy as np
 import time
-#import pylab as plt
-
 
 
 
 seed(4) #4
 
 
+"Auxiliary function"
 
 def PC0(x):
     if norm(x) > rC0:
         return rC0*x/norm(x)
     else:
         return x
-# rC0 = norm(5*np.ones([n]))
 
-# def PC0(x):
-#     # if norm(x) > rC0:
-#     #     return rC0*x/norm(x)
-#     # else:
-#     ub = 5*np.ones([n])
-#     lb =-5*np.ones([n])
-#     return np.clip(x,lb,ub)
-    
-"c1,...,Cr will be randomly generated hypercubes of length sqrt(2) "
 
-#c is the center of the hypercube
 def PCr(x,c):
     ub = c + np.sqrt(2)/2
     lb = c - np.sqrt(2)/2 
@@ -60,7 +50,6 @@ def PCr(x,c):
 def Qx(x):
     tempQx = Q@x
     return x.T @ tempQx.T
-"The derivative is 2*(Q@x).T"
 
 "Objective function is the following:"
 
@@ -75,8 +64,6 @@ def varphi(x):
     else:
         return np.inf
     
-"Formulación primal-dual de la función objetivo"
-"i.e. r*1/2||Psi(x)||**2) + iC0(x) + sum(iCi(yi) + ||yi||**2/2)-sum(Psi(x),y_i)"
 def Phi(x,y):
     if (x==PC0(x)).all:
         for ii in range(r):
@@ -100,9 +87,9 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
     xk = x.copy()
     yk = np.zeros([r,m])
     "first update"
-    gradQx = 2*(Q @ xk).T   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-    gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) #taking gamma_k < 1/(2*kappa + sum(<L_Psi,yi>))
-    #breakpoint()
+    gradQx = 2*(Q @ xk).T   
+    gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
+
     xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) #update en xk
     "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
     wk = (1-beta)*xkn + beta*xk
@@ -114,20 +101,13 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
         yk[ii,:] = PCr((tempyii+mu*Qx(wk))/(1+mu),cii)
     "here starts the loop"
     k = 1
-    while abs(Phi(xkn,yk)-Phi(xk,ykold)) > tol:  # and k <10:
+    while abs(Phi(xkn,yk)-Phi(xk,ykold)) > tol:  
         xk = xkn.copy()
-        gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+        gradQx = 2*(Q @ xk).T 
         gam  = gamma/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
         "update en xk"
         xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk))
-        #print(Phi(xkn,yk) > Phi(xk,yk))
-        
-        # if Phi(xkn,yk) > Phi(xk,yk):
-        #     print("Error!!")
-        #     print("Iteracion:", k)
-        #     print("Phi(xkn,yk):",Phi(xkn,yk))
-        #     print("Phi(xkn,yk) - Phi(xk,yk):",Phi(xkn,yk)-Phi(xk,yk))
-        #     breakpoint()
+
         wk = (1-beta)*xkn + beta*xk
         "update en yk"
         ykold = yk.copy()
@@ -146,15 +126,13 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     barlamk = barlam0
     xk = x.copy()
     yk = cCr.copy()
-    gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+    gradQx = 2*(Q @ xk).T 
     gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-    #eta = kappa +  Lips_Qx*sum(norm(yk,axis=1))/2-1/(2*gam)
      
   
     "first update"
-    # gradQx = 2*(Q @ xk).T   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-    # gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) #taking gamma_k < 1/(2*kappa + sum(<L_Psi,yi>))
-    #breakpoint()
+
+
     xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) #update en xk
     "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
     "update en yk"
@@ -182,16 +160,16 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     ykn = ykn + lamk*dyk
     "here starts the loop"
     k = 1
-    #print('Entrando al while')
-    while abs(Phi(xkn,ykn)-Phi(xk,yk)) > tol:  # and k <10:
+
+    while abs(Phi(xkn,ykn)-Phi(xk,yk)) > tol:  
         xk = xkn.copy()
         yk = ykn.copy()
-        gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+        gradQx = 2*(Q @ xk).T 
         gam  = gamma/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-        #eta = kappa +  Lips_Qx*sum(norm(yk,axis=1))/2-1/(2*gam)
+
         "update en xk"
         xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk))
-        #print(Phi(xkn,yk) > Phi(xk,yk))
+
         "update en yk"
         ykn= yk.copy()
         for ii in range(r):
@@ -216,10 +194,7 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
         else: barlamk= max(barlam0,(alph**exp_alph)*barlamk)
         xkn = xkn  + lamk*dxk
         ykn = ykn + lamk*dyk
-        # if k%50 == 0:
-        #     print(Phi(xkn,ykn))
-        #     print(Phi(xk,yk))
-        #     breakpoint()
+
     return xkn, ykn, k
 
 
@@ -227,18 +202,17 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
 
 
 
-"COMIENZO EXPERIMENTO"
-##################### EXPERIMENTO ###################################
-
-"Objetivo: comparar el splitting y el boosted splitting para diferentes dimensiones de problemas"
+"START EXPERIMENT"
+##################### EXPERIMENT ###################################
 
 
-use_saved_data = True
+
+use_saved_data = True # True for data in paper, False for new data
 
 repP = 10
 repS = 1
 
-sizesn = [  5, 10, 15, 20, 30, 50 ]#5, 10, 15, 25, 40]
+sizesn = [  5, 10, 15, 20, 30, 50 ]
 r = 5
 
 E3_Ssol = zeros([len(sizesn),repP,repS])
@@ -272,7 +246,7 @@ if use_saved_data == False:
             normcCr = 3*random(r)+7
             cCr = 2*random([r,m])-1
             ncCr = norm(cCr, axis = 1 )
-            cCr = normcCr[:, None] * cCr / ncCr[:, None] #estos son los centros de los hipercubos
+            cCr = normcCr[:, None] * cCr / ncCr[:, None] 
             
             #Operator Psi:
             Q = zeros([m,n,n])
@@ -280,22 +254,20 @@ if use_saved_data == False:
     
             for mm in range(m):
                 tempD = 2*random(n)-1
-                tempQ = np.diag(tempD) #dividimos por radio espectral, radio bola y raíz de m
+                tempQ = np.diag(tempD) 
                 Q[mm,:,:] =  tempQ
-                # tempQ = np.eye(n)
-                # Q[mm,:,:] = np.eye(n)
-                singvaluesQ[mm] = norm(tempQ,2) #guardamos el radio spectral de cada Q_mm
+
+                singvaluesQ[mm] = norm(tempQ,2) 
             
-            QM = zeros([m*n,n])         #for writting Q in matrix form
+            QM = zeros([m*n,n])         
             for mm in range(m):
                 QM[mm*n:(mm+1)*n,:] = Q[mm]
             normQ =  norm(QM,2) #
             maxu = 2*normQ*rC0
-            Lips_Qx =  2*normQ     #np.sqrt(m)*2*singvaluesQ.max()*rC0    #Lipschitz constant of Psi(x) = Qx(x)
-            #kappa = 6*r*rC0**2*np.sqrt(m)*normQ/2 #r*2*rC0*normQ*(1+ 2*normQ*rC0)/2
+            Lips_Qx =  2*normQ     
+
             kappa = 6*r*rC0**2*normQ*np.linalg.norm(np.array([np.linalg.norm(Q[i],ord=2) for i in range(m)]))/2
             
-            # breakpoint()
             for rSS in range(repS):
                 "Generate random starting point"
                 x0 = 10*random(n)
@@ -312,10 +284,9 @@ if use_saved_data == False:
                         
                 
                 start1 = time.time()
-                # NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,t0 = 2,Ny=2,tol=1e-6):
+
                 sol,_,it = NCsplitting_B(x0,gamma,mu,alph,kappa,Lips_Qx,barlam0=2,Ny=2,tol=1e-6)
-                # sol,_,it =  NCsplitting_B(x0,gamma,mu,alph,delta,Lips_Qx,t00x=2,Nx=2,t00y=2,Ny=2,tol=1e-6)
-                # sol,_,it = NCsplitting2(x0,gamma,mu,alph,delta,Lips_Qx,Ny=2,tol=1e-6)
+                
                 stop1 = time.time()
                 
                 E3_Bsol[NN,rPP,rSS] = varphi(sol)

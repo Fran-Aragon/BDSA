@@ -10,6 +10,8 @@ We test the nonconvex splitting for a generalized Heron problem
 consisting in finding a point x in a cc set C0 which minimizes the sum of 
 the quadratic distances of the image of x by some quadratic transformation
 to some cc sets C1,...,Cr
+
+Start of the experiment line 205
 """
 
 from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
@@ -23,14 +25,13 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 import pandas as pd
 import numpy as np
 import time
-#import pylab as plt
-
 
 
 
 seed(4) #4
 
 
+"Auxiliary functions"
 
 
 def PC0(x):
@@ -38,19 +39,8 @@ def PC0(x):
         return rC0*x/norm(x)
     else:
         return x
-# rC0 = norm(5*np.ones([n]))
 
-# def PC0(x):
-#     # if norm(x) > rC0:
-#     #     return rC0*x/norm(x)
-#     # else:
-#     ub = 5*np.ones([n])
-#     lb =-5*np.ones([n])
-#     return np.clip(x,lb,ub)
-    
-"c1,...,Cr will be randomly generated hypercubes of length sqrt(2) "
 
-#c is the center of the hypercube
 def PCr(x,c):
     ub = c + np.sqrt(2)/2
     lb = c - np.sqrt(2)/2 
@@ -59,11 +49,10 @@ def PCr(x,c):
 
 
 
-"función para calcular Psi(x)"
+"Psi(x)"
 def Qx(x):
     tempQx = Q@x
     return x.T @ tempQx.T
-"The derivative is 2*(Q@x).T"
 
 "Objective function is the following:"
 
@@ -78,8 +67,7 @@ def varphi(x):
     else:
         return np.inf
     
-"Formulación primal-dual de la función objetivo"
-"i.e. r*1/2||Psi(x)||**2) + iC0(x) + sum(iCi(yi) + ||yi||**2/2)-sum(Psi(x),y_i)"
+
 def Phi(x,y):
     if (x==PC0(x)).all:
         for ii in range(r):
@@ -95,7 +83,7 @@ def Phi(x,y):
 
 
 
-"Our algorithm is the foollowing"
+" DSA (no linesearch)"
 
 def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
     " x - initial starting point"
@@ -103,13 +91,12 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
     xk = x.copy()
     yk = np.zeros([r,m])
     "first update"
-    gradQx = 2*(Q @ xk).T   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-    gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) #taking gamma_k < 1/(2*kappa + sum(<L_Psi,yi>))
-    #breakpoint()
+    gradQx = 2*(Q @ xk).T   
+    gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
     xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) #update en xk
-    "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
+    
     wk = (1-beta)*xkn + beta*xk
-    "update en yk"
+    "update yk"
     ykold =yk.copy()
     for ii in range(r):
         tempyii = yk[ii,:]
@@ -119,20 +106,13 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
     k = 1
     while abs(Phi(xkn,yk)-Phi(xk,ykold)) > tol:  # and k <10:
         xk = xkn.copy()
-        gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+        gradQx = 2*(Q @ xk).T 
         gam  = gamma/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-        "update en xk"
+        "update  xk"
         xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk))
-        #print(Phi(xkn,yk) > Phi(xk,yk))
-        
-        # if Phi(xkn,yk) > Phi(xk,yk):
-        #     print("Error!!")
-        #     print("Iteracion:", k)
-        #     print("Phi(xkn,yk):",Phi(xkn,yk))
-        #     print("Phi(xkn,yk) - Phi(xk,yk):",Phi(xkn,yk)-Phi(xk,yk))
-        #     breakpoint()
+       
         wk = (1-beta)*xkn + beta*xk
-        "update en yk"
+        "update  yk"
         ykold = yk.copy()
         for ii in range(r):
             tempyii = yk[ii,:]
@@ -143,6 +123,8 @@ def NCsplitting(x,gamma,mu,kappa,Lips_Qx,beta=0,tol=1e-6):
 
 
 
+" BDSA (with lineasearch):"
+
 def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     " x - initial starting point"
     "the dual variables start all as the 0 vector"
@@ -151,16 +133,13 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     yk = cCr.copy()
     gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
     gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-    #eta = kappa +  Lips_Qx*sum(norm(yk,axis=1))/2-1/(2*gam)
      
   
     "first update"
-    # gradQx = 2*(Q @ xk).T   #derivada de Psi(x) es 2[Q1x, Q2x, Q3x]
-    # gam  = gamma*1/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1))) #taking gamma_k < 1/(2*kappa + sum(<L_Psi,yi>))
-    #breakpoint()
+
     xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk)) #update en xk
-    "último término es derivada de 1/2||Psi(x)||^2, que es [Psi'(x)]@Psi(x)"
-    "update en yk"
+ 
+    
     ykn =yk.copy()
     for ii in range(r):
         tempyii = yk[ii,:]
@@ -185,16 +164,15 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
     ykn = ykn + lamk*dyk
     "here starts the loop"
     k = 1
-    #print('Entrando al while')
     while abs(Phi(xkn,ykn)-Phi(xk,yk)) > tol:  # and k <10:
         xk = xkn.copy()
         yk = ykn.copy()
-        gradQx = 2*(Q @ xk).T # no need to do tranpose since we have to do it again later inside PC0
+        gradQx = 2*(Q @ xk).T 
         gam  = gamma/(2*kappa +  Lips_Qx*sum(norm(yk,axis=1)))
-        #eta = kappa +  Lips_Qx*sum(norm(yk,axis=1))/2-1/(2*gam)
-        "update en xk"
+        
+        "update xk"
         xkn = PC0( xk + gam*gradQx @ yk.sum(0) - r*gam*gradQx@Qx(xk))
-        #print(Phi(xkn,yk) > Phi(xk,yk))
+
         "update en yk"
         ykn= yk.copy()
         for ii in range(r):
@@ -219,21 +197,16 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
         else: barlamk= max(barlam0,(alph**exp_alph)*barlamk)
         xkn = xkn  + lamk*dxk
         ykn = ykn + lamk*dyk
-        # if k%50 == 0:
-        #     print(Phi(xkn,ykn))
-        #     print(Phi(xk,yk))
-        #     breakpoint()
+
     return xkn, ykn, k
 
 
 
 
+"Start of the experiment"
+############ Experiment  ###############
 
-############ Experiment 1 ###############
-# "COMIENZO EXPERIMENTO 1"
-# "Choosing best parameters for the splitting"
-
-use_saved_data = True
+use_saved_data = True #True: for data in the paper, False: new data
 
 repP = 5  #number of problems
 repS = 5  #number of starting point for each problem
@@ -271,8 +244,6 @@ if use_saved_data == False:
             tempD = 2*random(n)-1
             tempQ = np.diag(tempD) #dividimos por radio espectral, radio bola y raíz de m
             Q[mm,:,:] =  tempQ
-            # tempQ = np.eye(n)
-            # Q[mm,:,:] = np.eye(n)
             singvaluesQ[mm] = norm(tempQ,2) #guardamos el radio spectral de cada Q_mm
         
         QM = zeros([m*n,n])         #for writting Q in matrix form
