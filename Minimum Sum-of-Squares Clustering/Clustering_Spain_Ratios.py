@@ -4,9 +4,7 @@ Created on Tue Jun 26 09:51:11 2018
 
 @author: david
 
-comparison of Alg 1 and Alg 2
-Alg 2 now has backtracking
-We plot the time here also
+
 """
 
 from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
@@ -23,32 +21,16 @@ import time
 
 seed(11)
 
-saved = False # True for plotting the data used in the paper
+saved = True # True for plotting the data used in the paper
 
 
 A=np.array(pd.read_excel(io='Spain_peninsula_baleares_500.xlsx'))#.as_matrix()
 [m,n]=A.shape
 nC=[3,5,10,15,20,30,40,50]
-it=7
-it_lim=50
 eps = 1e-13
-prec = 1e-3
-itermaxS = 400 #número máximo de iteraciones para el splitting
+prec = 1e-4
 R = 10 #número de repeticiones por cada numero de centro
 
-#def f(x,A):
-##    x1=x[0:n]
-##    x2=x[n:2*n]
-#    s=0
-#    m=A.shape[0]
-#    for k in xrange(m):
-#        a=A[k]
-#        s+=min(norm(x-a,axis=1)**2)
-#    return s/m
-
-"The set is the union the halfspaces given by H1@x<=H2"
-#H1 = np.array([[1,0],[-1,0],[0,-1],[0,1]])
-#H2 = np.array([-5.2,3,-41,39.4])
 
 "Setting the constraints"
 
@@ -57,9 +39,7 @@ R = 10 #número de repeticiones por cada numero de centro
 
 def HPequation(xs,ys,pint):        #vertices cara, punto interior
     a = np.array([ys[1]-ys[0],-xs[1]+xs[0]])
-    #print("V. noral:",a)
     b = a@np.array([xs[0],ys[0]])
-    #print("T. indep:", b)
     if a@pint > b:
         return [-a,-b]
     else:
@@ -340,14 +320,9 @@ def iC(X,h1,h2):
             Si_h2 = h2[ii]
             nH = len(Si_h1)   #number hyperplanes of the set
             di= np.zeros(nH)
-            #print("i",ii)
             for jj in range(nH):
-                #print("j",jj)
                 di[jj] =Si_h2[jj]-Si_h1[jj]@x
-            #print(di)
             if all(di>=0-eps):
-                #print(di)
-                #print("Feasible")
                 Feasiblek = True
         if Feasiblek==False:
                 Feasible = False           
@@ -360,24 +335,15 @@ def iCk(x,h1,h2):   #number sets
     Feasible = False    
     nH = len(h1)   #number hyperplanes of the set
     di= np.zeros(nH)
-    #print("i",ii)
     for jj in range(nH):
-        #print("j",jj)
         di[jj] =h2[jj]-h1[jj]@x
-        #print(di)
     if all(di>=0-eps):
-        #print(di)
-        #print("Feasible")
         Feasible = True
-    #print(di)
     if Feasible:
         return 0
     else:
         return  np.inf
                 
-
-        
-
 def f(x,A):
     return  ((norm(repeat(x[newaxis,:,:],A.shape[0],0)-A[:,newaxis,:],axis=2)**2).min(axis=1)).sum()/A.shape[0]
 
@@ -390,10 +356,6 @@ def gf1(x,a0):   #A0 is defined below
     return 2*(x-a0)
 
 def gf2(x,A,lam=0.5):
-#    z=zeros(n)
-#    gf=concatenate([z,z])
-#    x1=x[0:n]
-#    x2=x[n:2*n]
     gf=zeros(x.shape)
     m=A.shape[0]
     for i in range(m):
@@ -402,20 +364,9 @@ def gf2(x,A,lam=0.5):
         gf_add=2*(x-a)
         gf_add[i_min,:]=zeros(n)
         gf+=gf_add
-#        if norm(a-x1)<norm(a-x2):
-#            gf+=2*concatenate([z,x2-a])
-#        elif norm(a-x1)>norm(a-x2):
-#            gf+=2*concatenate([x1-a,z])
-#        else:
-#            gf+=2*concatenate([lam*(x1-a),(1-lam)*(x2-a)])
     return gf/m
 
-#def compute_r(c1,c2,A):
-#    P1=where(argmin([norm(c1-A,axis=1),norm(c2-A,axis=1)],axis=0)==0)[0]
-#    P2=where(argmin([norm(c1-A,axis=1),norm(c2-A,axis=1)],axis=0)==1)[0]
-#    r1=(norm(c1-A[P1],axis=1)).max()
-#    r2=(norm(c2-A[P2],axis=1)).max()
-#    return r1,r2
+
 
 def compute_r(c,A):
     cc=zeros([c.shape[0],A.shape[0]])
@@ -449,24 +400,9 @@ if saved == False:
     
     for nc in range(len(nC)):
         c = nC[nc]
-        #a0=sum(A)/m
-        #a0=concatenate([a0,a0])
         a0=tile(sum(A)/m,[c,1])
         z=zeros(n)#array([0.0,0.0])   
         
-        #x1=array([1./4,3./4])
-        #x2=array([2.,3.])
-        #x1=array([.75,.5])
-        #x2=array([-1.3,.25])
-        #x1=a1+(random(2)-0.5)
-        #x1=random(n)*50#array([1.,-1.])
-        #x2=random(n)*50#2*a2-x1
-        #x1=random(2)
-        #x2=random(2)
-        #x1=array([1./2,2./3])
-        #x2=array([5.,1.])
-        
-        #x=concatenate([x1,x2])
         
         cmap=plt.cm.get_cmap('hsv')
         clineas=[1,1,1]
@@ -475,7 +411,6 @@ if saved == False:
         v=A.max(axis=0)-A.min(axis=0)
         for k in range(n):
             x[:,k]=random(c)*v[k]+A.min(axis=0)[k]
-        #print(0,f(x,A))
         
         
         a=A[0]
@@ -515,11 +450,7 @@ if saved == False:
             
             
             
-            
-            #eta = -(kappa-1/(2*gamma))
-            #t0 = 2 #tamaño de paso dir de descenso
             N = 2 #número de intentos a probar
-            #rold = N
             rho = .5
             barlam0 = 2
             barlamk = barlam0
@@ -597,9 +528,9 @@ if saved == False:
             xE = x0.copy()
             xE0 = xE.copy()
             # Parameters extrapolation
-            edel = 5*10**(-5)
+            edel = 5*10**(-25)
             elamb = 0.1
-            emub  = 0.01
+            emub  = 1
             ekapn = 1
             ekap1 = ekapn
     
@@ -619,7 +550,6 @@ if saved == False:
                 un = xE + elamn*(xE - xE0)
                 v = gf1(un,a0) - gf2(xE,A)
                 xEn = proxg(xE + emun*(xE-xE0) - gamma*v, H1,H2,V )
-                #plt.plot(xEn[:,0],xEn[:,1],'s',color = cEGPPA,markersize = 2,zorder = 4)
                             
                 k += 1
                 # Variable update:
@@ -649,18 +579,11 @@ if saved == False:
             
             
                 
-                    
-    
-            
-            
             Fvalues_S[nc,rr] = fxSn
             Fvalues_BS[nc,rr] = fxBn
             Fvalues_E[nc,rr] = fxEn
             
             
-                
-            # Fvalues_S[nc,rr] = fxSn
-            # Fvalues_BS[nc,rr] = fxBn
             
             times_S[nc,rr] = stop_S - start_S
             times_BS[nc,rr] = stop_BS - start_BS
@@ -676,13 +599,12 @@ if saved == False:
                 EwinsGPPA += 1
      
                     
-        
- 
 
-    #np.savez('Exp_Clustering_Ratios_240118', contadorfails, Fvalues_S, Fvalues_BS, Fvalues_E, times_S, times_BS,times_E, It_BS, It_S, It_E)
+    #np.savez('Exp_Clustering_Ratios_240221', contadorfails, Fvalues_S, Fvalues_BS, Fvalues_E, times_S, times_BS,times_E, It_BS, It_S, It_E)
+
 
 elif saved == True:
-    npzfile = np.load('Exp_Clustering_Ratios_240118.npz',allow_pickle = True )
+    npzfile = np.load('Exp_Clustering_Ratios_240221.npz',allow_pickle = True )
     times_S = npzfile['arr_4']
     times_BS = npzfile['arr_5']
     times_E = npzfile['arr_6']
@@ -695,18 +617,6 @@ elif saved == True:
 
 
 
-# Fvalues_diff = Fvalues_BS-Fvalues_S;
-
-# Med_S = np.sum(Fvalues_S[Fvalues_S>0],1)/len(Fvalues_S>0)
-# Med_BS = np.sum(Fvalues_BS[Fvalues_BS>0],1)/len(Fvalues_BS>0)
-
-# It_S = It_S[It_S>0]
-# It_BS = It_BS[It_BS>0]
-
-
-
-# Med_times_S = np.sum(times_S,1)/len(times_S)
-# Med_times_BS = np.sum(times_BS,1)/len(times_BS)
 
 ratioiter = It_S / It_BS
 ratiotime = times_S / times_BS
@@ -723,35 +633,32 @@ ratioiter_total = np.sum(np.sum(It_S))/np.sum(np.sum(It_BS))
 ratiotime_total = np.sum(np.sum(times_S))/np.sum(np.sum(times_BS))
 
 ratioiterE_total = np.sum(np.sum(It_E))/np.sum(np.sum(It_BS))
-ratiotimeE_total = np.sum(np.sum(It_E))/np.sum(np.sum(It_BS))
+ratiotimeE_total = np.sum(np.sum(times_E))/np.sum(np.sum(times_BS))
 
 
 
 plt.clf()
 ax = plt.gca()
-ax.plot(ratioiter_clusters,'o', markersize = 8, color = 'C0',zorder=4)
-ax.plot(ratioiterE_clusters,'X',markersize = 9, color = 'C1',zorder=4)
+ax.plot(ratioiter_clusters,'o', markersize = 8, color = 'C0',zorder=4,markeredgecolor='k')
+ax.plot(ratioiterE_clusters,'X',markersize = 9, color = 'C1',zorder=4,markeredgecolor='k')
 
 ax.hlines(ratioiter_total,-0.5,len(nC)-0.5,color = 'C0', linestyle = 'dashed' )
 ax.hlines(ratioiterE_total,-0.5,len(nC)-0.5,color = 'C1',linestyle='dotted')
 for i in range(len(nC)):
-    # It_Si = It_S[i]
-    # It_BSi = It_BS[i]
-    # ratioiteri = It_Si[It_Si>0]/It_BSi[It_BSi>0]
     ax.plot(i*np.ones(len(ratioiter[i,:])),ratioiter[i,:], 'o', markersize = 8, fillstyle = 'none', color = 'C0')
     ax.plot(i*np.ones(len(ratioiterE[i,:])),ratioiterE[i,:],'x',markersize = 8, fillstyle = 'none', color = 'C1')
 ax.set_xlabel('Number of clusters')
 ax.set_ylabel('Iterations ratio')
 ax.set_xticks([0,1,2,3,4,5,6,7])
 plt.xlim([-0.5,len(nC)-.5])
-#plt.ylim([0.5,5.5])
+
 ax.set_xticklabels(['3','5','10','15','20','30','40','50'])
 
 #Legend:
-legendS = Line2D([0],[0],label = 'GPPA/BDSA',marker = 'o', markersize = '4', 
-                 color = 'C0', linestyle = 'dashed' )
-legendE = Line2D([0],[0],label = 'ePSA/BDSA', marker = 'X', markersize = '6',
-                 color = 'C1', linestyle = 'dotted')
+legendS = Line2D([0],[0],label = 'GPPA/BDSA',marker = 'o', markersize = '7', 
+                 color = 'C0', linestyle = 'dashed',markeredgecolor='k' )
+legendE = Line2D([0],[0],label = 'ePSA/BDSA', marker = 'X', markersize = '8',
+                 color = 'C1', linestyle = 'dotted',markeredgecolor='k')
 
 
 
@@ -764,14 +671,14 @@ handles.extend([legendS,legendE])
 plt.legend(handles=handles,loc = 'best')
 
 
-plt.savefig('Figures\Cluster_Iterations.pdf',bbox_inches='tight',dpi=400)
+plt.savefig('Cluster_Iterations.pdf',bbox_inches='tight',dpi=400)
 plt.show()    
 
 plt.clf()
 
 ax = plt.gca()
-ax.plot(ratiotime_clusters,'o', markersize = 8, color = 'C0',zorder=4)
-ax.plot(ratiotimeE_clusters,'X',markersize = 9, color = 'C1',zorder=4)
+ax.plot(ratiotime_clusters,'o', markersize = 8,markeredgecolor='k', color = 'C0',zorder=4)
+ax.plot(ratiotimeE_clusters,'X',markersize = 9,markeredgecolor='k', color = 'C1',zorder=4)
 
 
 
@@ -779,23 +686,22 @@ ax.hlines(ratiotime_total,-.5,len(nC)-.5,color = 'C0', linestyle = 'dashed' )
 ax.hlines(ratiotimeE_total,-0.5,len(nC)-0.5,color = 'C1',linestyle='dotted')
 
 for i in range(len(nC)):
-    # times_Si = times_S[i]
-    # times_BSi = times_BS[i]
-    # ratiotimei = times_Si[times_Si>0]/times_BSi[times_BSi>0]
+ 
+    
     ax.plot(i*np.ones(len(ratiotime[i,:])),ratiotime[i,:], 'o', markersize = 8, fillstyle = 'none', color = 'C0')
     ax.plot(i*np.ones(len(ratiotimeE[i,:])),ratiotimeE[i,:],'x',markersize = 8, fillstyle = 'none', color = 'C1')
 ax.set_xlabel('Number of clusters')
 ax.set_ylabel('Time ratio')
 plt.xlim([-0.5,len(nC)-.5])
-#plt.ylim([0.5,5.5])
+
 ax.set_xticks([0,1,2,3,4,5,6,7])
 ax.set_xticklabels(['3','5','10','15','20','30','40','50'])
 
 #Legend:
-legendS = Line2D([0],[0],label = 'GPPA/BDSA',marker = 'o', markersize = '4', 
-                 color = 'C0', linestyle = 'dashed' )
-legendE = Line2D([0],[0],label = 'ePSA/BDSA', marker = 'X', markersize = '6',
-                 color = 'C1', linestyle = 'dotted')
+legendS = Line2D([0],[0],label = 'GPPA/BDSA',marker = 'o', markersize = '7', 
+                 color = 'C0', linestyle = 'dashed',markeredgecolor='k' )
+legendE = Line2D([0],[0],label = 'ePSA/BDSA', marker = 'X', markersize = '8',
+                 color = 'C1', linestyle = 'dotted',markeredgecolor='k')
 
 
 
@@ -807,7 +713,7 @@ handles.extend([legendS,legendE])
 
 plt.legend(handles=handles,loc = 'best')
 
-plt.savefig('Figures\Cluster_time.pdf',bbox_inches='tight',dpi=400)
+plt.savefig('Cluster_time.pdf',bbox_inches='tight',dpi=400)
 plt.show()
 
 

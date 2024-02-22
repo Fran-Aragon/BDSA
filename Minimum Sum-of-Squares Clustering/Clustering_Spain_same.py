@@ -8,7 +8,7 @@ Created on Tue Jun 26 09:51:11 2018
 
 "Line 30: defining the constraints"
 "Line 306:  algorithm codes  and auxiliary functions"
-"Line 475: running the experiment "
+"Line 455: running the experiment "
 "Line 789: plots "
 """
 
@@ -29,50 +29,23 @@ seed(11)
 A=np.array(pd.read_excel(io='Spain_peninsula_baleares_500.xlsx'))#.as_matrix()
 [m,n]=A.shape
 c=9
-it=27
-it_lim=50
 eps = 1e-13
 
-#def f(x,A):
-##    x1=x[0:n]
-##    x2=x[n:2*n]
-#    s=0
-#    m=A.shape[0]
-#    for k in xrange(m):
-#        a=A[k]
-#        s+=min(norm(x-a,axis=1)**2)
-#    return s/m
-
-"The set is the union the halfspaces given by H1@x<=H2"
-#H1 = np.array([[1,0],[-1,0],[0,-1],[0,1]])
-#H2 = np.array([-5.2,3,-41,39.4])
 
 "Setting the constraints"
 
 plt.figure(figsize=(12,6))
 plt.plot(A[:,0],A[:,1],'s',color=r'#695FFF',markersize=4,markeredgecolor='k',markeredgewidth=0.3) ##8eb9ff
-#plt.plot(a[0],a[1],'s',color=r'#8eb9ff',markersize=4,label='$a^i,\, i=1,\ldots,'+str(len(A))+'$',markeredgecolor='k',markeredgewidth=0.3)
-#plt.plot(x0[:,0],x0[:,1],'k.',markerfacecolor='k',markersize=12,markeredgewidth=0.7)
+
 plt.plot([])
 ax = plt.gca()
-#ax.axis('off')br
 
 
-# ax.axis([A.min(axis=0)[0]-0.3,A.max(axis=0)[0]+0.8,A.min(axis=0)[1]-0.6,A.max(axis=0)[1]+1.2])
-# a=A[0]
-# ax.set_aspect('equal')
-# plt.plot(a[0],a[1],'s',color=r'#695FFF',markersize=4,label='$a^i,\, i=1,\ldots,'+str(len(A))+'$',markeredgecolor='k',markeredgewidth=0.3)
-# plt.legend(loc='best',ncol=2)
-# plt.savefig('Clustering_Spain_0.pdf',bbox_inches='tight',dpi=800)
-# plt.show()
 
-# breakpoint()
 
 def HPequation(xs,ys,pint):        #vertices cara, punto interior
     a = np.array([ys[1]-ys[0],-xs[1]+xs[0]])
-    #print("V. noral:",a)
     b = a@np.array([xs[0],ys[0]])
-    #print("T. indep:", b)
     if a@pint > b:
         return [-a,-b]
     else:
@@ -362,14 +335,9 @@ def iC(X,h1,h2):
             Si_h2 = h2[ii]
             nH = len(Si_h1)   #number hyperplanes of the set
             di= np.zeros(nH)
-            #print("i",ii)
             for jj in range(nH):
-                #print("j",jj)
                 di[jj] =Si_h2[jj]-Si_h1[jj]@x
-            #print(di)
             if all(di>=0-eps):
-                #print(di)
-                #print("Feasible")
                 Feasiblek = True
         if Feasiblek==False:
                 Feasible = False           
@@ -384,14 +352,9 @@ def iCk(x,h1,h2):   #number sets
     di= np.zeros(nH)
     #print("i",ii)
     for jj in range(nH):
-        #print("j",jj)
         di[jj] =h2[jj]-h1[jj]@x
-        #print(di)
     if all(di>=0-eps):
-        #print(di)
-        #print("Feasible")
         Feasible = True
-    #print(di)
     if Feasible:
         return 0
     else:
@@ -412,10 +375,7 @@ def gf1(x,a0):   #A0 is defined below
     return 2*(x-a0)
 
 def gf2(x,A,lam=0.5):
-#    z=zeros(n)
-#    gf=concatenate([z,z])
-#    x1=x[0:n]
-#    x2=x[n:2*n]
+
     gf=zeros(x.shape)
     m=A.shape[0]
     for i in range(m):
@@ -424,20 +384,9 @@ def gf2(x,A,lam=0.5):
         gf_add=2*(x-a)
         gf_add[i_min,:]=zeros(n)
         gf+=gf_add
-#        if norm(a-x1)<norm(a-x2):
-#            gf+=2*concatenate([z,x2-a])
-#        elif norm(a-x1)>norm(a-x2):
-#            gf+=2*concatenate([x1-a,z])
-#        else:
-#            gf+=2*concatenate([lam*(x1-a),(1-lam)*(x2-a)])
     return gf/m
 
-#def compute_r(c1,c2,A):
-#    P1=where(argmin([norm(c1-A,axis=1),norm(c2-A,axis=1)],axis=0)==0)[0]
-#    P2=where(argmin([norm(c1-A,axis=1),norm(c2-A,axis=1)],axis=0)==1)[0]
-#    r1=(norm(c1-A[P1],axis=1)).max()
-#    r2=(norm(c2-A[P2],axis=1)).max()
-#    return r1,r2
+
 
 def compute_r(c,A):
     cc=zeros([c.shape[0],A.shape[0]])
@@ -516,51 +465,9 @@ val_BS = zeros(iterations+1)
 val_E = zeros(iterations+1)
 lambdas = np.ones(iterations+1)
 
-# for k in range(iterations+100):
-#     v = gf1(xS,a0) - gf2(xS,A) 
-#     xSn = proxg(xS-gamma*v, H1, H2)
-   
-#     print(k+1,FC(xSn,A))
-#     xS = xSn
-    
-# sol=xS.copy()
-
-# for k in range(c-1):
-#     plt.plot(xS[k,0],xS[k,1],'k*',markersize=18,markerfacecolor=[0,0.8,0],markeredgewidth=1)
-# plt.plot(xS[k+1,0],xS[k+1,1],'k*',markersize=18,markerfacecolor=[0,0.8,0],markeredgewidth=1,label='Critical point')
-
-# ax = plt.gca()
-# ax = plt.gca()
-# #ax.axis('off')
-# ax.axis([A.min(axis=0)[0]-0.3,A.max(axis=0)[0]+0.8,A.min(axis=0)[1]-0.6,A.max(axis=0)[1]+1.2])
-# ax.set_aspect('equal')
-# plt.plot(x0,y0,'k.-',markersize=6,label='GPPA')
-# plt.plot(xBSn[0],xBSn[1],'rx-',markersize=6,label='BDSA')
-# #plt.plot(xSn[0],xSn[1],'y*-',markersize=6,label='Split')
-# #plt.plot(a[0],a[1],'s',color=r'#8eb9ff',markersize=4,label='$a^i,\, i=1,\ldots,'+str(len(A))+'$',markeredgecolor='k',markeredgewidth=0.3)
-# plt.legend(loc='best',ncol=2)
-# #plt.savefig('Clustering_Spain_0.pdf',bbox_inches='tight',dpi=800)
-
-"Uncomment for plot 2"
-# plt.plot(x[:,0],x[:,1],'k.',markerfacecolor='k',markersize=12,markeredgewidth=0.7)
-
-# handles, labels = ax.get_legend_handles_labels()
-
-# lineG = Line2D([0], [0], color='k', linestyle='-', marker='.', label ='GPPA')
 
 
-# # handles is a list, so append manual patch
-# lineB = Line2D([0], [0], color='red',  linestyle='-',marker='x',label='BDSA')
-
-
-# handles[:0]= [lineG, lineB]
-# plt.legend(handles=handles, loc='best',ncol=2)
-
-# plt.savefig('Clustering_Spain_2.pdf',bbox_inches='tight',dpi=800)
-# plt.show()
-
-
-
+eps_stop=1e-4
 
 
 "Splitting"
@@ -574,7 +481,6 @@ xBS = x0.copy()
 val_BS[0] = 5#FC(xBS,A)
 
 
-#eta = -(kappa-1/(2*gamma))
 barlamk0 = 2 #tamaño de paso dir de descenso
 barlamk = barlamk0
 N = 2 #número de intentos a probar
@@ -603,45 +509,33 @@ for k in range(iterations):
         barlamk=2*barlamk
     else:
         barlamk = max(barlamk0,(rho**r)*lamk) #t00
-    
-    # if norm(FC(xBSn,A)-FC(xBold,A))/FC(xBSn,A)<1e-3:
-    #     kF = 1
 
-    #print( norm(dB) )
-    plt.plot(xBSn[:,0],xBSn[:,1],'rx',markersize=6,zorder=4)
+    plt.plot(xBSn[:,0],xBSn[:,1],'k+',markeredgewidth=0.7,markersize=6,zorder=4)
     for j in range(c):
-        plt.plot([xBSn[j,0],xBS[j,0]],[xBSn[j,1],xBS[j,1]],'r',linewidth=2,zorder=4)
-    plt.plot([xBSn[0],xBS[0]],[xBSn[1],xBS[1]],'r',linewidth=2,zorder=4)
-    plt.plot([xBSn[2],xBS[2]],[xBSn[3],xBS[3]],'r',linewidth=2,zorder=4)
+        plt.plot([xBSn[j,0],xBS[j,0]],[xBSn[j,1],xBS[j,1]],'k',linewidth=2,zorder=4)
+    plt.plot([xBSn[0],xBS[0]],[xBSn[1],xBS[1]],'k',linewidth=2,zorder=4)
+    plt.plot([xBSn[2],xBS[2]],[xBSn[3],xBS[3]],'k',linewidth=2,zorder=4)
     
     
     ax = plt.gca()
-    #ax.axis('off')
     ax.axis([A.min(axis=0)[0]-0.3,A.max(axis=0)[0]+0.8,A.min(axis=0)[1]-0.6,A.max(axis=0)[1]+1.2])
     ax.set_aspect('equal')
-    #plt.plot(xSn[0],xSn[1],'k.-',markersize=6,zorder=4)
     if kF ==0:
-        plt.plot(xBSn[0],xBSn[1],'rx-',markersize=6,zorder=4)
+        plt.plot(xBSn[0],xBSn[1],'k+-',markeredgewidth=.7,markersize=5,zorder=4)
     else:
         
         plt.plot(xBSn[:,0],xBSn[:,1],'k*',markersize=20)
 
-        plt.plot(xBSn[:,0],xBSn[:,1],'r*',markersize=16)
-        plt.plot(xBSn[:,0],xBSn[:,1],'r*',markersize=14,label='critical point')
-    #plt.plot(xSn[0],xSn[1],'y*-',markersize=6,label='Split')
-    # plt.plot(a[0],a[1],'s',color=r'#8eb9ff',markersize=4,label='$a^i,\, i=1,\ldots,'+str(len(A))+'$',markeredgecolor='k',markeredgewidth=0.3)
+        plt.plot(xBSn[:,0],xBSn[:,1],'k*',markersize=16)
+        plt.plot(xBSn[:,0],xBSn[:,1],'k*',markersize=14,label='critical point')
 
-    #plt.savefig('Clustering_Spain_0.pdf',bbox_inches='tight',dpi=800)
-    #plt.plot(x[:,0],x[:,1],'k.',markerfacecolor='k',markersize=12,markeredgewidth=0.7)
     handles, labels = ax.get_legend_handles_labels()
     
     
 
-    lineG = Line2D([0], [0], color='k', linestyle='-', marker='.', label ='GPPA')
+    lineG = Line2D([0], [0], color='r', linestyle='-', marker='.',markersize=3, label ='GPPA')
 
-
-    # handles is a list, so append manual patch
-    lineB = Line2D([0], [0], color='red',  linestyle='-',marker='x',label='BDSA')
+    lineB = Line2D([0], [0], color='k',  linestyle='-',marker='+',markeredgewidth=.7,label='BDSA')
 
     
     handles[:0] = [lineG, lineB] 
@@ -650,14 +544,9 @@ for k in range(iterations):
     
     plt.legend(handles=handles, loc='best',ncol=2)
     
-    #plt.legend(loc='best',ncol=2)
-    # plt.savefig('Clustering_Spain_'+str(k+2)+'.pdf',bbox_inches='tight',dpi=800)
-    #plt.savefig('Clustering_Spain_F0.pdf',bbox_inches='tight',dpi=800)
 
- 
-    if FC(xBSn,A) > FC(xBS,A):
-        print("Error:", k)
-    if abs(FC(xBS,A)-FC(xBSn,A))/FC(xBSn,A)<1e-3:
+
+    if abs(FC(xBS,A)-FC(xBSn,A))/FC(xBSn,A)<eps_stop:
         print('Iterations BDSA:', k)
         break
         
@@ -666,9 +555,9 @@ for k in range(iterations):
     
     print(k+1, FC(xS,A), FC(xBS,A), barlamk, r, lamk, norm(gf1(xS,a0)-gf2(xS,A)) , norm(gf1(xBS,a0)-gf2(xBS,A)))
     
-    
+iterations=k #We plot up to the number of iterations computed by BDSA
 
-cGPPA='k'
+cGPPA='r'
 
 for k in range(iterations):
     
@@ -676,29 +565,30 @@ for k in range(iterations):
     "Split"
     v = gf1(xS,a0) - gf2(xS,A) 
     xSn = proxg(xS-gamma*v, H1, H2,V)
-    plt.plot(xSn[:,0],xSn[:,1],'.',color=cGPPA,markersize=5,zorder=4)
+    plt.plot(xSn[:,0],xSn[:,1],'.',color=cGPPA,markersize=3,zorder=6)
     
     for j in range(c):
-        plt.plot([xSn[j,0],xS[j,0]],[xSn[j,1],xS[j,1]],'-',color=cGPPA,linewidth=1,zorder=4)
+        plt.plot([xSn[j,0],xS[j,0]],[xSn[j,1],xS[j,1]],'-',color=cGPPA,linewidth=1,zorder=6)
  
     xS = xSn
     val_S[k+1] = FC(xS,A)
     
-    if norm(FC(xSold,A)-FC(xS,A))/FC(xS,A)<1e-3:
+    if norm(FC(xSold,A)-FC(xS,A))/FC(xS,A)<eps_stop:
         print('Iterations GPPA:', k)
         break
     
 " Extrapolated GPPA"
 
-cEGPPA = 'C1'
+cEGPPA = 'orange'
+mEGPPA = 'x'
 
 val_E[0] = 5
 xE = x0.copy()
 xE0 = xE.copy()
 # Parameters extrapolation
-edel = 5*10**(-5)
+edel = 5e-25
 elamb = 0.1
-emub  = 0.01
+emub  = 1
 ekapn = 1
 ekap1 = ekapn
 
@@ -715,7 +605,7 @@ for k in range(iterations):
     un = xE + elamn*(xE - xE0)
     v = gf1(un,a0) - gf2(xE,A)
     xEn = proxg(xE + emun*(xE-xE0) - gamma*v, H1,H2,V )
-    plt.plot(xEn[:,0],xEn[:,1],'s',color = cEGPPA,markersize = 2,zorder = 4)
+    plt.plot(xEn[:,0],xEn[:,1],marker=mEGPPA,markeredgewidth=.5,linestyle='none',color = cEGPPA,markersize = 5,markerfacecolor='none',zorder = 4)
     
     # Variable update:
     if (k+1)%50:
@@ -727,7 +617,7 @@ for k in range(iterations):
         ekapn = (1+ np.sqrt(1+4*ekapn**2))/2
     
     for j in range(c):
-        plt.plot([xEn[j,0],xE[j,0]],[xEn[j,1],xE[j,1]],'--',color=cEGPPA,linewidth=1,zorder=4)
+        plt.plot([xEn[j,0],xE[j,0]],[xEn[j,1],xE[j,1]],'-',markeredgewidth=.5,color=cEGPPA,linewidth=1,zorder=4)
 
     
     xE0 = xE.copy()
@@ -735,7 +625,7 @@ for k in range(iterations):
     
     val_E[k+1] = FC(xEn,A)
     
-    if norm(FC(xE0,A)-FC(xE,A))/FC(xE,A)<1e-3:
+    if norm(FC(xE0,A)-FC(xE,A))/FC(xE,A)<eps_stop:
         print('Iterations ePSA:', k)
         break
     
@@ -744,33 +634,27 @@ print('BDSA:', FC(xBS,A))
 print('GPPA:', FC(xS,A))
 print('ePSA:', FC(xE,A))
 
-pp = 8*27
+pp = 8*iterations
 xlambdas = np.linspace(0,iterations,pp)
 ylambdas = np.zeros(len(xlambdas))
 for ll in range(iterations):
     sep = int(pp/iterations)
     ylambdas[ll*sep] = lambdas[ll]
 
-#plt.figure(figsize=(12,6))
-#plt.plot(A[:,0],A[:,1],'s',color=r'#5C85FF',markersize=4,markeredgecolor='k',markeredgewidth=0.3)
 ax = plt.gca()
-#ax.axis('off')
 ax.axis([A.min(axis=0)[0]-0.3,A.max(axis=0)[0]+0.8,A.min(axis=0)[1]-0.6,A.max(axis=0)[1]+1.2])
 ax.set_aspect('equal')
-# plt.plot(a[0],a[1],'s',color=r'#8eb9ff',markersize=4,label='$a^i,\, i=1,\ldots,'+str(len(A))+'$',markeredgecolor='k',markeredgewidth=0.3)
 
 
-# plt.plot(xSn[:,0],xSn[:,1],'C0*',markersize=16,markerfacecolor='k',zorder=4)
-# plt.plot(xSn[:,0],xSn[:,1],'k*',markersize=16)
 
-plt.plot(xBSn[:,0],xBSn[:,1],'C0*',markersize=16,markerfacecolor='r',zorder=4)
-plt.plot(xBSn[:,0],xBSn[:,1],'C0*',markersize=16,label='critical point',markerfacecolor='none',zorder=0)
-#plt.plot(xE[:,0],xE[:,1],'C0*',markersize = 16, markerfacecolor='C1',zorder=4)
+
+plt.plot(xBSn[:,0],xBSn[:,1],'C2*',markersize=16,markerfacecolor='k',zorder=4)
+plt.plot(xBSn[:,0],xBSn[:,1],'C2*',markersize=16,label='critical point',markerfacecolor='none',zorder=0)
 
 
 plt.plot(xSn[0],xSn[1],'.-',color=cGPPA,markersize=6,label='GPPA')
-plt.plot(xBSn[0],xBSn[1],'rx-',markersize=6,label='BDSA')
-plt.plot(xE[0],xEn[1],'s--',color = cEGPPA,markersize=3,label= 'ePSA')
+plt.plot(xBSn[0],xBSn[1],'k+-',markersize=6,label='BDSA')
+plt.plot(xE[0],xEn[1],'x-',color = cEGPPA,markerfacecolor='none',markersize=5,label= 'ePSA')
 
 
 handles, labels = ax.get_legend_handles_labels()
@@ -778,30 +662,26 @@ handles, labels = ax.get_legend_handles_labels()
 
 handles0 =[handles[2], handles[3], handles[4], handles[0], handles[1]]
 
-#plt.plot(xSn[0],xSn[1],'y*-',markersize=6,label='Split')
-#plt.plot(a[0],a[1],'s',color=r'#8eb9ff',markersize=4,label='$a^i,\, i=1,\ldots,'+str(len(A))+'$',markeredgecolor='k',markeredgewidth=0.3)
+
 plt.legend(handles = handles0, loc='best',ncol=2)
-#plt.savefig('Clustering_Spain_0.pdf',bbox_inches='tight',dpi=800)
-#plt.plot(x[:,0],x[:,1],'k.',markerfacecolor='k',markersize=12,markeredgewidth=0.7)
-plt.savefig('Figures\Clustering_Spain_Fill_Same.jpg',bbox_inches='tight',dpi=300)
+plt.savefig('Figures\Clustering_Spain_Fill_Same.jpg',bbox_inches='tight',dpi=400)
 
 
 "plot decreasing and stepsize"
 fig, ax1 =  plt.subplots(figsize=(6,6))
 ax2 = ax1.twinx()
-# ax1.axis([0,iterations,val_BS[iterations]-0.5,val_S[1]+0.5])
 ax1.set_xlabel('$k$')
-ax1.set_ylabel('$φ(X^k)$')
+ax1.set_ylabel('$f(X^k)$')
 ax2.set_ylabel('$\\lambda_{k}$')
-ax1.plot(val_S,'mediumblue', marker='.',markersize=10,label = 'GPPA')
-ax1.plot(val_BS[:28], 'r', marker='|',label = 'BDSA')
-ax1.plot(val_E,'--', color='C1',marker = 's', markersize = 2.5,label = 'ePSA')
-ax1.plot(0,0,'r',linestyle='dotted',label='$\\lambda_{k}$')
-ax2.plot(range(28),lambdas[:28],'r',linestyle='dotted',label='$\\lambda_{k}$') #'$\\alpha^{r}\lambda_k$'
+ax1.plot(val_S,color=cGPPA, marker='.',markersize=5,label = 'GPPA')
+ax1.plot(val_BS[:iterations+1], 'k', marker='+',label = 'BDSA')
+ax1.plot(val_E,'-', color='C1',marker = mEGPPA, markersize = 5,label = 'ePSA')
+ax1.plot(0,0,'k',linestyle='dotted',label='$\\lambda_{k}$')
+ax2.plot(range(iterations+1),lambdas[:iterations+1],'k',linestyle='dotted',label='$\\lambda_{k}$') #'$\\alpha^{r}\lambda_k$'
 ax1.legend(loc='best')
 ax1.set_ylim(0,ax1.get_ylim()[1])
 ax2.set_ylim(0,ax2.get_ylim()[1])
-plt.xlim([0,27])
+plt.xlim([0,iterations])
 plt.savefig('Figures\Clustering_decrease_Same.pdf',bbox_inches='tight',dpi=800)
 
 
