@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 20 09:06:29 2023
+Created on Wed Feb 28 10:15:29 2024
 
-@author: david
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
-Generalized quadratic Heron Problem
+Code associated with the paper:
 
-We test the nonconvex splitting for a generalized Heron problem
-consisting in finding a point x in a cc set C0 which minimizes the sum of 
-the quadratic distances of the image of x by some quadratic transformation
-to some cc sets C1,...,Cr
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
 
-Start of the experiment line 205
+#####################################################
+Section: A Nonconvex Generalization of the Squared Heron’s Problem
+
+This file generates Table 3
+
+The experiment starts in line 205
+    
+#####################################################
 """
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
-from numpy.linalg import norm, eig
-import math
-import numpy.linalg as LA
+from numpy import  zeros
+from numpy.linalg import norm
 from numpy.random import random, seed
-from matplotlib import pyplot as plt
-from matplotlib.colors import to_rgb
-from scipy.spatial import Voronoi, voronoi_plot_2d
-import pandas as pd
 import numpy as np
 import time
-
 
 
 seed(4) #4
@@ -279,11 +278,11 @@ if use_saved_data == False:
                             
                     
     "To  save data"     
-    #np.savez('Exp_Param_Splitting_20230626', Asol, Aiter, Atime)     
+    #np.savez('Exp_Results_Param_v01', Asol, Aiter, Atime)     
 
 elif use_saved_data == True:
     # # "Load data" 
-    npzfile = np.load('Exp_Param_Splitting_20230626.npz',allow_pickle = True )
+    npzfile = np.load('Exp_Results_Param_v01.npz',allow_pickle = True )
     Asol = npzfile['arr_0']
     Aiter = npzfile['arr_1']
     Atime = npzfile['arr_2']
