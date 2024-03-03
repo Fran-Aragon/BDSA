@@ -35,7 +35,6 @@ seed(4) #4
 " Auxiliary functions "
 
 
-
 def PC0(x):
     if norm(x) > rC0:
         return rC0*x/norm(x)
@@ -132,7 +131,8 @@ def NCsplitting2(x,gamma,alph,kappa,Ny=2,tol=1e-6):
         xk = xkn.copy()
         "update  xk"
         Lxk = L@xk
-        subdf= L.T@(Lxk-PCr(Lxk, cc))   
+        subdf= L.T@(Lxk-PCr(Lxk, cc))  
+        xkn = PC0( xk -gam*subdf)
         k += 1
         "Linear Search"
         dxk=xkn-xk
@@ -163,7 +163,7 @@ use_saved_data = True #True for data in the paper, False: new problems
 repP = 10
 repS = 1
 
-sizesn = [ 50, 100, 200, 300, 500]
+sizesn = [ 50, 100, 200, 300, 500, 1000, 2000]
 
 r = 5
 
@@ -214,7 +214,7 @@ if use_saved_data == False:
                 
                 E3_Ssol[NN,rPP,rSS] = varphi(sol)
                 E3_Siter[NN,rPP,rSS] = it
-                E3_Stime[NN,rPP,rSS] = starttime-stoptime
+                E3_Stime[NN,rPP,rSS] = stoptime-starttime
                 
                 print('Split done!!')
                         
@@ -225,7 +225,7 @@ if use_saved_data == False:
                 
                 E3_Bsol[NN,rPP,rSS] = varphi(sol)
                 E3_Biter[NN,rPP,rSS] = it
-                E3_Btime[NN,rPP,rSS] = start1-stop1
+                E3_Btime[NN,rPP,rSS] = stop1-start1
                 
                 print('Boosted done!!')
                 
@@ -271,17 +271,15 @@ averagetime_B  = np.sum(averagetime0_B,axis=1)/repP
 diftime0 = averagetime0_S / averagetime0_B
 diftime = averagetime_S / averagetime_B
 
-difitertotal = np.sum(difiter)/(len(sizesn)-1)
-diftimetotal = np.sum(diftime) /(len(sizesn)-1)
+difitertotal = np.sum(difiter)/(len(sizesn))
+diftimetotal = np.sum(diftime) /(len(sizesn))
 
 
 
-" Plot de Iteraciones "
 
 
-" Plot de Iteraciones "
+" Plot de Iterations "
 
-sizesn = [ 50, 100, 200, 300, 500]
 
 averageiter0_S = np.sum(E3_Siter,axis=2)/repS
 averageiter_S  = np.sum(averageiter0_S,axis=1)/repP
@@ -326,9 +324,9 @@ ax.set_xlim([-0.5,len(sizesn)-0.5])
 ax.set_ylim([1.9,7])
 ax.set_xlabel('n')
 ax.set_ylabel('Iterations ratio DSA/ BDSA')
-ax.set_xticks([0,1,2,3,4])
+ax.set_xticks([0,1,2,3,4,5,6])
 plt.title('GHP with nonconvex sets')
-ax.set_xticklabels(['50', '100','200','300','500'])
+ax.set_xticklabels(['50', '100','200','300','500','1000','2000'])
 
 plt.savefig('HP_SplitVSBoosted_Iter_NC.pdf',bbox_inches='tight',dpi=400)
 plt.show()    
@@ -349,9 +347,9 @@ ax.hlines(diftimetotal,-0.5,len(sizesn)-0.5,colors='crimson',linestyles='dashed'
 ax.set_xlim([-0.5,len(sizesn)-0.5])
 ax.set_xlabel('n')
 ax.set_ylabel('Time ratio DSA/BDSA')
-ax.set_xticks([0,1,2,3,4])
+ax.set_xticks([0,1,2,3,4,5,6])
 plt.title('GHP with nonconvex sets')
-ax.set_xticklabels(['50', '100','200','300','500'])
+ax.set_xticklabels(['50', '100','200','300','500','1000','2000'])
 
 plt.savefig('HP_SplitVSBoosted_Time_NC.pdf',bbox_inches='tight',dpi=400)
 plt.show()   
