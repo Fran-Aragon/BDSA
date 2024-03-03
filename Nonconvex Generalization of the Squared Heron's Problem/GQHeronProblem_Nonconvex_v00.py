@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 20 09:06:29 2023
+Created on Wed Feb 21 09:06:29 2024
 
-@author: david
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
-Generalized quadratic Heron Problem NONCOVEX SETS
+Code associated with the paper:
 
-We test the nonconvex splitting for a generalized Heron problem
-consisting in finding a point x in a cc set C0 which minimizes the sum of 
-the quadratic distances of the image of x by some quadratic transformation
-to some cc sets C1,...,Cr
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
 
-The experiment starst in line 208
+#####################################################
+Section: A Nonconvex Generalization of the Squared Heron’s Problem
+
+This file generates Figure 10
+
+The experiment starst in line 158
+    
+#####################################################
 """
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
-from numpy.linalg import norm, eig
+from numpy import  zeros
+from numpy.linalg import norm
 import math
-import numpy.linalg as LA
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
-from matplotlib.colors import to_rgb
-from scipy.spatial import Voronoi, voronoi_plot_2d
-import pandas as pd
 import numpy as np
 import time
-#import pylab as plt
 
 
 seed(4) #4
@@ -80,7 +81,7 @@ def NCsplitting(x,gamma,kappa,tol=1e-6):   #Lips_Qx,
     " x - initial starting point"
     gam  = gamma*1/(2*kappa )
     xk = x.copy()
-    #yk = np.zeros([r,m])
+
     "first update"
     Lxk = L@xk
     subdf= L.T@(Lxk-PCr(Lxk, cc))  
@@ -158,7 +159,7 @@ def NCsplitting2(x,gamma,alph,kappa,Ny=2,tol=1e-6):
 ##################### EXPERIMENT  ###################################
 
 
-use_saved_data = True
+use_saved_data = True #True for data in the paper, False: new problems
 repP = 10
 repS = 1
 
@@ -229,10 +230,10 @@ if use_saved_data == False:
                 print('Boosted done!!')
                 
                 "To  save data"     
-                #np.savez('Exp_HP_SplitVSBoosted_NCS_v00', E3_Ssol, E3_Siter, E3_Stime, E3_Bsol, E3_Biter, E3_Btime) 
+                #np.savez('Exp_Results_NCS_v00', E3_Ssol, E3_Siter, E3_Stime, E3_Bsol, E3_Biter, E3_Btime) 
      
 elif use_saved_data == True:
-    npzfile = np.load('Exp_HP_SplitVSBoosted_NCS_v00.npz',allow_pickle = True )
+    npzfile = np.load('Exp_Results_NCS_v00.npz',allow_pickle = True )
     E3_Ssol = npzfile['arr_0']
     E3_Siter = npzfile['arr_1']
     E3_Stime = npzfile['arr_2']
