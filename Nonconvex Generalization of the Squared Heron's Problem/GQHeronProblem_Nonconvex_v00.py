@@ -15,7 +15,7 @@ Section: A Nonconvex Generalization of the Squared Heron’s Problem
 
 This file generates Figure 10
 
-The experiment starst in line 158
+The experiment starts in line 158
     
 #####################################################
 """
