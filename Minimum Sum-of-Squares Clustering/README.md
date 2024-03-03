@@ -4,3 +4,4 @@
 - `Clustering_Spain_worst` generates Figure 5.
 - `Clustering_Spain_same` generates Figure 6.
 - `Clustering_Spain_Ratios` generates Figure 7.
+- `Exp_Results_Clustering_Ratios` results of the experiment displayed in Figure 7.
