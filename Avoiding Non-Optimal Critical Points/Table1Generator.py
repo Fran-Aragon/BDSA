@@ -2,21 +2,27 @@
 """
 Created on Fri Apr  7 12:38:30 2023
 
-Last modified Wed Jan 10
 
-@author: David Torregrosa-Belén
-"""
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
+Code associated with the paper:
+
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
+
+#####################################################
 "Section: Avoiding Non-Optimal Critical Points"
 
-" For generating  the data in table 1 "
+For generating  the data in table 1
 
-" Change n and p in lines 100-101 to get the different rows"
+Change n and p in lines 94-95 to get the different rows
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
-from numpy.linalg import norm, eig
-import math
-import numpy.linalg as LA
+#####################################################
+
+"""
+
+from numpy.linalg import norm
 from numpy.random import random, seed
 import numpy as np
 #import pylab as plt

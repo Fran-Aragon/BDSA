@@ -2,20 +2,27 @@
 """
 Created on Fri Apr  7 12:38:30 2023
 
-Last modified Wed Jan 10
 
-@author: David Torregrosa-Belén
-"""
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
+Code associated with the paper:
+
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
+
+#####################################################
 "Section: Avoiding Non-Optimal Critical Points"
 
-" For generating fig 2 "
+For generating  Fig 2
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
-from numpy.linalg import norm, eig
-import math
-import numpy.linalg as LA
-from numpy.random import random, seed
+#####################################################
+
+"""
+
+
+from numpy.linalg import norm
+from numpy.random import  seed
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -49,8 +56,6 @@ def varphi(x):
 
 phisol = varphi(-4*np.ones(n))
 
-# def varphi(x):
-#     return cte*norm(x)**2 - np.sum(abs(x))-np.sum(abs(1-x))
 
 def varphiplot(x,y):
     sumat = 0
@@ -89,7 +94,7 @@ def Phi(x,y):
     
     
     
-def proxl1(x,tau,mu): #calcula  prox_mu de la conjugada de |x-tau|_l1
+def proxl1(x,tau,mu): 
     return np.clip(x-mu*tau,-1,1)
 
 
@@ -97,7 +102,7 @@ def prox_minus_l1(x,gamma):
     return  x + gamma*np.sign(x)
 
 
-def subh_minus_l1(x): #sub. of -h
+def subh_minus_l1(x): 
     sumat = 0
     for ii in range(1,p+1):
         sumat += minsign(x-ii) + minsign(x+ii)
@@ -389,7 +394,7 @@ iDCA = iDCA[0:kk,:]
 " BDSA no linesearch "
 
 xk = x0.copy()
-gam_min_l1 = 0.9
+gam_min_l1 = .9
 
 kk= 1 
 xkold  =  xk.copy()
@@ -418,7 +423,6 @@ gam_min_l1 = 0.9
 alph = 0.5
 barlam0 = 2
 barlamk = barlam0
-#eta = -1/gamma
 N = 2
 
 kk= 1
