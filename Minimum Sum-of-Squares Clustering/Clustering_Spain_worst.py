@@ -1,28 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun 26 09:51:11 2018
+Created on Wed Feb 14 09:51:11 2024
 
-@author: david
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
-" This file generates Figure 6:"
+Code associated with the paper:
 
-"Line 30: defining the constraints"
-"Line 306:  algorithm codes  and auxiliary functions"
-"Line 466: running the experiment"
-"Line 789: plots "
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
+
+#####################################################
+Section: Minimum Sum-of-Squares Constrained Clustering Problem
+
+This file generates Figure 6
+
+The file is organized as follows:
+    
+Line 46: defining the constraints
+Line 291:  algorithm codes  and auxiliary functions
+Line 475: running the experiment
+Line 664: plots 
+
+#####################################################
 """
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
+from numpy import where, argmin, zeros, tile, repeat, newaxis
 from numpy.linalg import norm
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
-from matplotlib.colors import to_rgb
-from scipy.spatial import Voronoi, voronoi_plot_2d
 import pandas as pd
 import numpy as np
-import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
-#import pylab as plt
 
 seed(5)
 

@@ -1,23 +1,38 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun 26 09:51:11 2018
+Created on Sat Wed 21 08:32:47 2024
 
-@author: david
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
+Code associated with the paper:
 
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
+
+#####################################################
+Section: Minimum Sum-of-Squares Constrained Clustering Problem
+
+This file generates Figure 7
+
+The file is organized as follows:
+    
+Line 50: defining the constraints
+Line 278:  algorithm codes  and auxiliary functions
+Line 440: running the experiment
+Line 633: plots 
+
+#####################################################
 """
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
+from numpy import  where, argmin, zeros, tile, repeat, newaxis
 from numpy.linalg import norm
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
-from matplotlib.colors import to_rgb
-from scipy.spatial import Voronoi, voronoi_plot_2d
 from matplotlib.lines import Line2D
 import pandas as pd
 import numpy as np
 import time
-#import pylab as plt
 
 seed(11)
 
@@ -29,15 +44,12 @@ A=np.array(pd.read_excel(io='Spain_peninsula_baleares_500.xlsx'))#.as_matrix()
 nC=[3,5,10,15,20,30,40,50]
 eps = 1e-13
 prec = 1e-4
-R = 10 #número de repeticiones por cada numero de centro
+R = 10  # repetitions for every number of centroifs
 
 
 "Setting the constraints"
 
-
-
-
-def HPequation(xs,ys,pint):        #vertices cara, punto interior
+def HPequation(xs,ys,pint):        
     a = np.array([ys[1]-ys[0],-xs[1]+xs[0]])
     b = a@np.array([xs[0],ys[0]])
     if a@pint > b:
@@ -263,6 +275,8 @@ H1 = [S1_H1,S2_H1,S3_H1,S4_H1,S5_H1,S6_H1,S7_H1,S8_H1,S9_H1]
 H2 = [S1_H2,S2_H2,S3_H2,S4_H2,S5_H2,S6_H2,S7_H2,S8_H2,S9_H2]
 V =  [V1,V2,V3,V4,V5,V6,V7,V8,V9]
 
+"Auxiliary functions"
+
 def proxg(X,h1,h2,V):
     if iC(X,h1,h2) == 0:
         return X
@@ -424,9 +438,7 @@ if saved == False:
             x0=x.copy()
             
             
-            "Aquí comienza el  experimento  para el splitting"
-            
-            
+            "Here starts the  experiment"
         
             
             "Computing the solution with the Splitting and more iterations"
@@ -600,11 +612,11 @@ if saved == False:
      
                     
 
-    #np.savez('Exp_Clustering_Ratios_240221', contadorfails, Fvalues_S, Fvalues_BS, Fvalues_E, times_S, times_BS,times_E, It_BS, It_S, It_E)
+    #np.savez('Exp_Results_Clustering_Ratios', contadorfails, Fvalues_S, Fvalues_BS, Fvalues_E, times_S, times_BS,times_E, It_BS, It_S, It_E)
 
 
 elif saved == True:
-    npzfile = np.load('Exp_Clustering_Ratios_240221.npz',allow_pickle = True )
+    npzfile = np.load('Exp_Results_Clustering_Ratios.npz',allow_pickle = True )
     times_S = npzfile['arr_4']
     times_BS = npzfile['arr_5']
     times_E = npzfile['arr_6']
