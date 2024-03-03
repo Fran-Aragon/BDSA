@@ -2,27 +2,30 @@
 """
 Created on Mon Feb 05 16:42:25 2024
 
-@author: David Torregrosa-Belén
-"""
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
+Code associated with the paper:
+
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
+
+#####################################################
 "Section: Avoiding Non-Optimal Critical Points"
 
-" For generating  the plots in Table 2 "
+For generating Table 2
+#####################################################
 
+"""
 
-
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
-from numpy.linalg import norm, eig
-import math
-import numpy.linalg as LA
-from numpy.random import random, seed
-from matplotlib import pyplot as plt
+from numpy.linalg import norm
+from numpy.random import seed, random
 import numpy as np
 
 seed(4)
 
 
-n = 10000 #dimension: change and execute to get the rows in the table
+n = 2 #dimension: change and execute to get the rows in the table
 
 "Auxiliary functions:"
 
