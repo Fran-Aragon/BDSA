@@ -13,7 +13,7 @@ The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
 #####################################################
 Section: A Nonconvex Generalization of the Squared Heron’s Problem
 
-This file generates Table 3
+This file generates Figure 9
 
 The experiment starts in line 205
     
