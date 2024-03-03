@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 20 09:06:29 2023
+Created on Thu Feb 22 13:17:49 2024
 
-@author: david
+Authors: Francisco J. Aragón-Artacho, Pedro Pérez-Aros, David Torregrosa-Belén
 
-Generalized quadratic Heron Problem
+Code associated with the paper:
 
-We test the nonconvex splitting for a generalized Heron problem
-consisting in finding a point x in a cc set C0 which minimizes the sum of 
-the quadratic distances of the image of x by some quadratic transformation
-to some cc sets C1,...,Cr
+F.J. Aragón-Artacho, P. Pérez-Aros, D. Torregrosa-Belén: 
+The Boosted Double-proximal Subgradient Algorithm for nonconvex optimization.
+(https://arxiv.org/abs/2306.17144)
 
-Start of the experiment line 205
+#####################################################
+Section: A Nonconvex Generalization of the Squared Heron’s Problem
+
+This file generates Figure 8
+
+The experiment starts in line 205
+    
+#####################################################
 """
 
-from numpy import array, concatenate, where, argmin, maximum, zeros, tile, repeat, newaxis, append, arange
-from numpy.linalg import norm, eig
+from numpy import  zeros
+from numpy.linalg import norm
 import math
-import numpy.linalg as LA
 from numpy.random import random, seed
 from matplotlib import pyplot as plt
-from matplotlib.colors import to_rgb
-from scipy.spatial import Voronoi, voronoi_plot_2d
-import pandas as pd
 import numpy as np
 import time
 
 
-
-seed(4) #4
+seed(4) 
 
 
 "Auxiliary function"
@@ -201,7 +202,6 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
 
 
 
-
 "START EXPERIMENT"
 ##################### EXPERIMENT ###################################
 
@@ -296,10 +296,10 @@ if use_saved_data == False:
                 print('Boosted done!!')
                 
                 "To  save data"     
-                #np.savez('Exp_HP_SplitVSBoosted_20230626_temp', E3_Ssol, E3_Siter, E3_Stime, E3_Bsol, E3_Biter, E3_Btime) 
+                #np.savez('Exp_Results_GHP_nm_v01.npz', E3_Ssol, E3_Siter, E3_Stime, E3_Bsol, E3_Biter, E3_Btime) 
      
 elif use_saved_data == True:
-    npzfile = np.load('Exp_HP_SplitVSBoosted_20230626_nm_v01.npz',allow_pickle = True )
+    npzfile = np.load('Exp_Results_GHP_nm_v01.npz',allow_pickle = True )
     E3_Ssol = npzfile['arr_0']
     E3_Siter = npzfile['arr_1']
     E3_Stime = npzfile['arr_2']
