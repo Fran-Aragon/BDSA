@@ -99,8 +99,8 @@ def subh_minus_l1(x): #sub. of -h
 
 # Change n and p (q) for obtaining the different rows 
 # in the table
-n = 2 #dimensión espacio
-p = 5
+n = 20 #dimensión espacio
+p = 3
 
 
 
@@ -275,7 +275,7 @@ for rr in range(rep):
     " DSA (no linesearch) "
     
     xk = x0.copy()
-    gam_min_l1 = 0.9
+    gam_min_l1 = 0.49
     
     xkold  =  xk.copy()
     temp1 = xk - gam_min_l1*(2*xk + subh_minus_l1(xk)) 
@@ -295,7 +295,7 @@ for rr in range(rep):
     " BDSA (with linesearch)"
     
     xk = x0.copy()
-    gam_min_l1 = 0.9
+    gam_min_l1 = 0.49
     
     alph = 0.5
     barlam0 = 2

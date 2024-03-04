@@ -111,7 +111,7 @@ def subh_minus_l1(x):
 
 " Initialization"
     
-x0 = np.array([1.5, -0.5]) #initial points
+x0 = np.array([1.8, 0.3]) #initial points
 y0= np.array([0,0.])   
 
 
@@ -394,7 +394,7 @@ iDCA = iDCA[0:kk,:]
 " BDSA no linesearch "
 
 xk = x0.copy()
-gam_min_l1 = .9
+gam_min_l1 = .4
 
 kk= 1 
 xkold  =  xk.copy()
@@ -418,7 +418,7 @@ BDSA = BDSA[0:kk,:]
 " BDSA linesearch"
 
 xk = x0.copy()
-gam_min_l1 = 0.9
+gam_min_l1 = 0.4
 
 alph = 0.5
 barlam0 = 2
