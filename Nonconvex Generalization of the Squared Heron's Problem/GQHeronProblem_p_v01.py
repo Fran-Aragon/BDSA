@@ -28,7 +28,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import time
 
-seed(4) #4
+seed(4) 
 
 
 
@@ -205,7 +205,7 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
 ##################### EXPERIMENT  ###################################
 
 
-use_saved_data = True # True for using data paper, false for generate new
+use_saved_data = False # True for using data paper, false for generate new
 
 repP = 10
 repS = 1
@@ -231,7 +231,7 @@ mu = 0.5
 alph = 0.5
 delta = 2
 
-if use_saved_data == False:
+if use_saved_data == True:
     for NN in range(len(sizesr)):
         r = sizesr[NN]
         m = math.floor(0.8*n)

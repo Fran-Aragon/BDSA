@@ -207,7 +207,7 @@ def NCsplitting_B(x,gamma,mu,alph,kappa,Lips_Qx,barlam0 = 2,Ny=2,tol=1e-6):
 
 
 
-use_saved_data = True # True for data in paper, False for new data
+use_saved_data = False # True for data in paper, False for new data
 
 repP = 10
 repS = 1

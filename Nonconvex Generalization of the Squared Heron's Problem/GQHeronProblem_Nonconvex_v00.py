@@ -29,7 +29,7 @@ import numpy as np
 import time
 
 
-seed(4) #4
+seed(4) 
 
 
 " Auxiliary functions "
