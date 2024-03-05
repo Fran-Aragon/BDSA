@@ -26,7 +26,7 @@ from numpy.random import seed
 from matplotlib import pyplot as plt
 import numpy as np
 
-seed(4)
+# seed(4)
 
 n=2
 
@@ -53,6 +53,14 @@ def subl1_neg(x):
     p = -np.sign(x)
     p[p==0] = -1 
     return p
+
+def sign0(x):
+    p = np.sign(x)
+    p[x==0] = 1
+    return p
+        
+def prox_minus_l1(x,gamma):
+    return  x + gamma*sign0(x)
         
         
 " Algorithms:"
@@ -88,7 +96,6 @@ def inertial_proximal_linearized(x0,igam,rho,prec):
     output['iter'] = kk
     return output
 
-
 def BDSA(x0,gamma,prec,alph=.5,barlam0=2,barlamk=2,N=2):
     output = {}
     
@@ -99,6 +106,51 @@ def BDSA(x0,gamma,prec,alph=.5,barlam0=2,barlamk=2,N=2):
     xkold = x0.copy()
     xk = x0.copy()
     BDSA[kk,:] = xk
+    
+    while kk == 1 or norm(xkold-xk)/n>prec:
+        xkold = xk.copy()
+
+        subh = 2*xk-grad_log_e(xk) 
+        temp1 = xk-gamma*subh
+        hatxk = prox_minus_l1(temp1, gamma)
+        dxk = hatxk - xk
+        r = 0 
+        lamk = barlamk
+        if (dxk==0).all():
+            xkn = hatxk.copy()
+        else: 
+            while varphi(hatxk+lamk*dxk) > varphi(hatxk) - 0.1*lamk**2*norm(dxk)**2:
+                r+=1 
+                if r < N:
+                    lamk = (alph**r)*lamk
+                else:
+                    lamk = 0 
+                    break 
+            if r==0:
+                barlamk = 2*barlamk 
+            else: barlamk = max((alph**r)*lamk,barlam0)
+            xkn = hatxk + lamk*dxk
+        xk = xkn.copy()
+        kk += 1 
+        BDSA[kk,:] = xk 
+    BDSA = BDSA[0:kk,:]
+
+    
+    output['BDSA'] = BDSA
+    output['iter'] = kk
+    
+    return output
+
+def BPDCA(x0,gamma,prec,alph=.5,barlam0=2,barlamk=2,N=2):
+    output = {}
+    
+    BPDCA = np.zeros([1000,2])
+    BPDCA[0,:] = x0
+    
+    kk = 1
+    xkold = x0.copy()
+    xk = x0.copy()
+    BPDCA[kk,:] = xk
     
     while kk == 1 or norm(xkold-xk)/n>prec:
         xkold = xk.copy()
@@ -125,10 +177,10 @@ def BDSA(x0,gamma,prec,alph=.5,barlam0=2,barlamk=2,N=2):
             xkn = hatxk + lamk*dxk
         xk = xkn.copy()
         kk += 1 
-        BDSA[kk,:] = xk 
-    BDSA = BDSA[0:kk,:]
+        BPDCA[kk,:] = xk 
+    BPDCA = BPDCA[0:kk,:]
     
-    output['BDSA'] = BDSA
+    output['BPDCA'] = BPDCA
     output['iter'] = kk
     
     return output
@@ -137,57 +189,24 @@ def BDSA(x0,gamma,prec,alph=.5,barlam0=2,barlamk=2,N=2):
 " Main experiments:"
 
 prec = 1e-6
-initial_points = np.array([[-.9,-2],[-1.2,.3],[2,-1]])   
+initial_points = np.array([[-.6,-1.3],[.5,-1.4]]) #[-.9,-2], 
 
 
 
 " BDSA gamma=...."
 
-gam_BDSA = 0.7
-
-xmin,xmax=-2.5,3.5
-ymin,ymax=-2.5,3.5
-
-
-xpoints = np.linspace(xmin,xmax,100)
-
-ypoints     = np.linspace(ymin,ymax,100)
-
-X, Y = np.meshgrid(xpoints,ypoints)
-Z = vphi(X,Y)
-
-plt.figure()
-plt.contour(X, Y, Z, 100, cmap='rainbow',linewidths=.8)
-plt.axis([xmin,xmax,ymin,ymax])
-ax = plt.gca()
-ax.set_aspect('equal')
-plt.colorbar()
-
-for ll in range(3):
-    
-    x0 = initial_points[ll]
-    
-
-    outputBDSA = BDSA(x0,gam_BDSA,prec,alph=.5,barlam0=2,barlamk=2,N=2)
-    
-
-    BDSAsol = outputBDSA['BDSA']
-    
-    plt.plot(BDSAsol[:,0],BDSAsol[:,1],'.--',markersize = 6, color='C3',label='Boosted PDCA')
-    plt.plot(x0[0],x0[1],'.',color = 'k',markersize = 8)
-    plt.plot(BDSAsol[len(BDSAsol)-1:,0],BDSAsol[len(BDSAsol)-1:,1], 'C0*',markersize=10,markeredgecolor = 'k')
-
-plt.title('BPDCA $\\gamma = $'+str(gam_BDSA))
-
-plt.savefig('Log_e_example_BDSA_'+str(gam_BDSA)+'.pdf',bbox_inches='tight',dpi=400)
-plt.show() 
-
+gam_BDSA = 0.49
 
 " Inertial DCA igam=..."
 
 rho = 1
 igam = 0.999*rho/2
 
+" BPDCA gamma=...."
+
+gam_BPDCA = 1
+
+
 xmin,xmax=-2.5,3.5
 ymin,ymax=-2.5,3.5
 
@@ -199,32 +218,70 @@ ypoints     = np.linspace(ymin,ymax,100)
 X, Y = np.meshgrid(xpoints,ypoints)
 Z = vphi(X,Y)
 
-plt.figure()
-plt.contour(X, Y, Z, 100, cmap='rainbow',linewidths=.8)
-plt.axis([xmin,xmax,ymin,ymax])
-ax = plt.gca()
-ax.set_aspect('equal')
-plt.colorbar()
+linea=1.2
+mlinea=.8
 
-for ll in range(3):
+
+    
+
+for ll in range(2):
+    
+    # Contour plot
+
+    plt.figure()
+    plt.contour(X, Y, Z, 100, cmap='rainbow',linewidths=.8)
+    plt.axis([xmin,xmax,ymin,ymax])
+    ax = plt.gca()
+    ax.set_aspect('equal')
+    plt.colorbar()
+    
+    # Algorithms
+    
+    "BDSA"
+   
     
     x0 = initial_points[ll]
+    # x0=np.random.rand(2)*6-2.5
+    
+    outputBDSA = BDSA(x0,gam_BDSA,prec,alph=.5,barlam0=2,barlamk=2,N=2)
     
 
+    BDSAsol = outputBDSA['BDSA']
+    
+    plt.plot(BDSAsol[1:3,0],BDSAsol[1:3,1],'--', color=[0.3,0.3,0.3],lw=linea,mew=mlinea)
+    plt.plot(BDSAsol[2:,0],BDSAsol[2:,1],'s--', markersize = 4, color=[0.3,0.3,0.3],markerfacecolor='None',label='BDSA',lw=linea,mew=mlinea)
+  
+
+    "BPDCA"
+    
+    outputBPDCA = BPDCA(x0,gam_BPDCA,prec,alph=.5,barlam0=2,barlamk=2,N=2)
+    
+    BPDCAsol = outputBPDCA['BPDCA']
+    
+    plt.plot(BPDCAsol[1:3,0],BPDCAsol[1:3,1],'--',markersize = 5,markerfacecolor='None', color='C1',zorder=3,lw=linea,mew=mlinea)
+    plt.plot(BPDCAsol[2:,0],BPDCAsol[2:,1],'X--',markersize = 5,markerfacecolor='None', color='C1',label='BPDCA',zorder=3,lw=linea,mew=mlinea)
+    
+
+    "iDCA"
+    
     outputiDCA = inertial_proximal_linearized(x0,igam,rho,prec)
 
 
     iDCAsol = outputiDCA['iDCA']
     
-    plt.plot(iDCAsol[:,0],iDCAsol[:,1],'.--',markersize = 6,color = 'r', label = 'Inertial DCA')
-    plt.plot(x0[0],x0[1],'.',color = 'k',markersize = 8)
-    plt.plot(iDCAsol[len(iDCAsol)-1:,0],iDCAsol[len(iDCAsol)-1:,1], 'C0*',markersize=10,markeredgecolor = 'k')
+    plt.plot(iDCAsol[1:3,0],iDCAsol[1:3,1],'-',markersize = 4,color = 'C0', zorder=2,lw=linea,mew=mlinea)
+    plt.plot(iDCAsol[2:,0],iDCAsol[2:,1],'d-',markersize = 4,color = 'C0', label = 'iDCA',zorder=2,lw=linea,mew=mlinea)
+  
+    plt.plot(x0[0],x0[1],'ko',ms=4,zorder=4)
+
+    plt.legend(loc = 'upper left', ncol=1)
+
+
+    plt.savefig('Log_e_example_'+str(ll)+'.pdf',bbox_inches='tight',dpi=400)
+    plt.show() 
 
 
 
-plt.title('iDCA $\\beta = $'+str(igam))
-plt.savefig('Log_e_example_iDCA_'+str(igam)+'.pdf',bbox_inches='tight',dpi=400)
-plt.show() 
 
 
 
