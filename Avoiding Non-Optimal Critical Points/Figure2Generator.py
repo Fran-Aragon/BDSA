@@ -504,15 +504,32 @@ plt.colorbar()
 
 linea=1.2
 mlinea=.8
-plt.plot(BDSA[:,0],BDSA[:,1],'s-', markersize = 3, color='C2',label='DSA',lw=linea,mew=mlinea)
 
-plt.plot(OneProx[:,0],OneProx[:,1],'x-', markersize = 6, color='k',label='PDCA',lw=linea,mew=mlinea)
-plt.plot(DPGA[:,0],DPGA[:,1],'.-',markersize = 6,color='C5',label='DGA',lw=linea,mew=mlinea)
-plt.plot(iDCA[:,0],iDCA[:,1],'d-',markersize = 4,color = 'C0', label = 'iDCA',zorder=2,lw=linea,mew=mlinea)
-plt.plot(BDSA_ls[:,0],BDSA_ls[:,1],'s--', markersize = 4, color=[0.3,0.3,0.3],markerfacecolor='None',label='BDSA',lw=linea,mew=mlinea)
-plt.plot(BOneProx[:,0],BOneProx[:,1],'X--',markersize = 5,markerfacecolor='None', color='C1',label='BPDCA',zorder=3,lw=linea,mew=mlinea)
+plt.plot(x0[0],x0[1],'.',color='k', zorder = 10)
 
-plt.plot(BDPGA[:,0],BDPGA[:,1],'.--', markersize = 6, color='C3',markerfacecolor='none',label='BDGA',lw=linea,mew=mlinea)
+
+plt.plot(BDSA[1:,0],BDSA[1:,1],'s-', markersize = 3, color='C2',label='DSA',lw=linea,mew=mlinea)
+plt.plot(BDSA[0:2,0],BDSA[0:2,1],'-', markersize = 3, color='C2',lw=linea,mew=mlinea)
+
+plt.plot(OneProx[1:,0],OneProx[1:,1],'x-', markersize = 6, color='k',label='PDCA',lw=linea,mew=mlinea)
+plt.plot(OneProx[0:2,0],OneProx[0:2,1],'-', markersize = 6, color='k',lw=linea,mew=mlinea)
+
+plt.plot(DPGA[1:,0],DPGA[1:,1],'.-',markersize = 6,color='C5',label='DGA',lw=linea,mew=mlinea)
+plt.plot(DPGA[0:2,0],DPGA[0:2,1],'-',markersize = 6,color='C5',lw=linea,mew=mlinea)
+
+plt.plot(iDCA[1:,0],iDCA[1:,1],'d-',markersize = 4,color = 'C0', label = 'iDCA',zorder=2,lw=linea,mew=mlinea)
+plt.plot(iDCA[0:2,0],iDCA[0:2,1],'-',markersize = 4,color = 'C0',zorder=2,lw=linea,mew=mlinea)
+
+plt.plot(BDSA_ls[1:,0],BDSA_ls[1:,1],'s--', markersize = 4, color=[0.3,0.3,0.3],markerfacecolor='None',label='BDSA',lw=linea,mew=mlinea)
+plt.plot(BDSA_ls[0:2,0],BDSA_ls[0:2,1],'--', markersize = 4, color=[0.3,0.3,0.3],markerfacecolor='None',lw=linea,mew=mlinea)
+
+plt.plot(BOneProx[1:,0],BOneProx[1:,1],'X--',markersize = 5,markerfacecolor='None', color='C1',label='BPDCA',zorder=3,lw=linea,mew=mlinea)
+plt.plot(BOneProx[0:2,0],BOneProx[0:2,1],'--',markersize = 5,markerfacecolor='None', color='C1',zorder=3,lw=linea,mew=mlinea)
+
+plt.plot(BDPGA[1:,0],BDPGA[1:,1],'.--', markersize = 6, color='C3',markerfacecolor='none',label='BDGA',lw=linea,mew=mlinea)
+plt.plot(BDPGA[0:2,0],BDPGA[0:2,1],'.--', markersize = 6, color='C3',markerfacecolor='none',lw=linea,mew=mlinea)
+
+plt.plot(x0[0],x0[1],'ko',ms=4)
 
 plt.legend(loc = 'upper left',ncol=2)
 
