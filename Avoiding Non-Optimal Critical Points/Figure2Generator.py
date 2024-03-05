@@ -98,8 +98,13 @@ def proxl1(x,tau,mu):
     return np.clip(x-mu*tau,-1,1)
 
 
+def sign0(x):
+    p = np.sign(x)
+    p[x==0] = 1
+    return p
+
 def prox_minus_l1(x,gamma):
-    return  x + gamma*np.sign(x)
+    return  x + gamma*sign0(x)
 
 
 def subh_minus_l1(x): 

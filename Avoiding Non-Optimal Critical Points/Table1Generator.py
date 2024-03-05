@@ -83,8 +83,13 @@ def proxl1(x,tau,mu): #calcula  prox_mu de la conjugada de |x-tau|_l1
     return np.clip(x-mu*tau,-1,1)
     
 
+def sign0(x):
+    p = np.sign(x)
+    p[x==0] = 1
+    return p
+
 def prox_minus_l1(x,gamma):
-    return  x + gamma*np.sign(x)
+    return  x + gamma*sign0(x)
 
 
 def subh_minus_l1(x): #sub. of -h
@@ -141,10 +146,20 @@ DCAgana = 0
 DCAempate = 0
 BDCAgana = 0
 
+DSAwin = 0 
+PDCAwin = 0 
+DSAties = 0
+
+hipercube = 0 
+
+
 for rr in range(rep):
     x0 = 2*(p+2)*random(n)-(p+2)
     y0 = 2*random(n)-1
     
+    
+    if all(x0>= -(p+2))  and  all(x0<=-p):
+        hipercube += 1
     "Double Proximal Gradient Algorithm"
     
     xk = x0.copy() #initial point for the double-Prox
@@ -291,6 +306,7 @@ for rr in range(rep):
     if norm(varphi(xk)-phisol) < precO:
         exitosDSA += 1    
     
+    phiDSA = varphi(xk)
     
     " BDSA (with linesearch)"
     
@@ -372,6 +388,13 @@ for rr in range(rep):
         
     if norm(varphi(xk)-phisol) < precO:
         exitosPrimal += 1
+        
+    if  varphi(xk) - phiDSA  >  prec0:
+        DSAwin += 1
+    elif  phiDSA - varphi(xk) > prec0:
+        PDCAwin += 1 
+    else:
+        DSAties += 1
         
     "Boosted Proximal DC algorithm"
     
@@ -476,11 +499,12 @@ print("Comparativa Double-Prox")
 print("# veces Boosted DP alcanza mejor valor que DP:", BDPgana)
 print("# número veces alcanzan mismo valor:", DPempate)
 print("# veces DP alcanza mejor valor que el boosted:", DPgana)
-print("ComparativaDCA")
-print("# veces BDCA alcanza mejor valor que DCA:", BDCAgana)
-print("# número veces alcanzan mismo valor:", DCAempate)
-print("# veces DCA alcanza mejor valor que el boosted:", DCAgana)
+print("ComparativaDSAvsPDCA")
+print("# veces DSA alcanza mejor valor que PDCA:", DSAwin)
+print("# número veces alcanzan mismo valor:", DSAties)
+print("# veces PDCA alcanza mejor valor que DSA:", PDCAwin)
 
+print('# initial points in the hipercube around the minimum:',hipercube)
 
 
 
