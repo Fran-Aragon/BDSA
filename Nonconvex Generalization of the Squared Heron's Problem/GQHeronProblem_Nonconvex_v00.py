@@ -163,7 +163,7 @@ use_saved_data = True #True for data in the paper, False: new problems
 repP = 10
 repS = 1
 
-sizesn = [ 50, 100, 200, 300, 500, 1000, 2000]
+sizesn = [ 50, 100, 200, 300, 500, 1000, 2000,3000]
 
 r = 5
 
@@ -324,9 +324,9 @@ ax.set_xlim([-0.5,len(sizesn)-0.5])
 ax.set_ylim([1.9,7])
 ax.set_xlabel('n')
 ax.set_ylabel('Iterations ratio DSA/ BDSA')
-ax.set_xticks([0,1,2,3,4,5,6])
+ax.set_xticks([0,1,2,3,4,5,6,7])
 plt.title('GHP with nonconvex sets')
-ax.set_xticklabels(['50', '100','200','300','500','1000','2000'])
+ax.set_xticklabels(['50', '100','200','300','500','1000','2000','3000'])
 
 plt.savefig('HP_SplitVSBoosted_Iter_NC.pdf',bbox_inches='tight',dpi=400)
 plt.show()    
@@ -347,9 +347,9 @@ ax.hlines(diftimetotal,-0.5,len(sizesn)-0.5,colors='crimson',linestyles='dashed'
 ax.set_xlim([-0.5,len(sizesn)-0.5])
 ax.set_xlabel('n')
 ax.set_ylabel('Time ratio DSA/BDSA')
-ax.set_xticks([0,1,2,3,4,5,6])
+ax.set_xticks([0,1,2,3,4,5,6,7])
 plt.title('GHP with nonconvex sets')
-ax.set_xticklabels(['50', '100','200','300','500','1000','2000'])
+ax.set_xticklabels(['50', '100','200','300','500','1000','2000','3000'])
 
 plt.savefig('HP_SplitVSBoosted_Time_NC.pdf',bbox_inches='tight',dpi=400)
 plt.show()   
