@@ -399,7 +399,7 @@ iDCA = iDCA[0:kk,:]
 " BDSA no linesearch "
 
 xk = x0.copy()
-gam_min_l1 = .4
+gam_min_l1 = .49
 
 kk= 1 
 xkold  =  xk.copy()
@@ -423,7 +423,7 @@ BDSA = BDSA[0:kk,:]
 " BDSA linesearch"
 
 xk = x0.copy()
-gam_min_l1 = 0.4
+gam_min_l1 = .49
 
 alph = 0.5
 barlam0 = 2
